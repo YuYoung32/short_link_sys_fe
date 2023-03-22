@@ -29,6 +29,7 @@ const options = {
 };
 
 const {memTotalSize, cpuUsageRatioLastSec} = storeToRefs(serverStore);
+const {mbToGb} = storeToRefs(serverStore);
 
 
 serverStore.fetchServerStaticInfo();
@@ -79,6 +80,7 @@ const lineOptions = ref(options);
         <span class="text-green-500 font-medium">
           cpuUsage: {{ cpuUsageRatioLastSec }}
           memTotal: {{ memTotalSize }}
+          roundup:{{mbToGb}}
         </span>
         <span class="text-500">since last visit</span>
       </div>
