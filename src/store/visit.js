@@ -32,25 +32,25 @@ const actions = {
     async fetchVisitAmountXhr(x) {
         axios.get(`/visit/amount_xhr?x=${x}`)
             .then(response => {
-                this.visitAmountLastXHour = response.data;
+                this.visitAmountLastXHour = response.data.visitAmountLastXHour;
             });
     },
     async fetchVisitIpXhr(x) {
         axios.get(`/visit/ip_xhr?x=${x}`)
             .then(response => {
-                this.visitIPLastXHour = response.data;
+                this.visitIPLastXHour = response.data.visitIPLastXHour;
             });
     },
     async fetchVisitAmountXHourTotal(x) {
         axios.get(`/visit/amount_xhr_total?x=${x}`)
             .then(response => {
-                this.visitAmountLastXHourTotal = response.data;
+                this.visitAmountLastXHourTotal = response.data.visitAmountLastXHourTotal;
             });
     },
     async fetchVisitDetails(amount) {
         axios.get(`/visit/details?amount=${amount}`)
             .then(response => {
-                this.visitDetails = response.data;
+                this.visitDetails = response.data.visitDetails;
             });
     }
 };

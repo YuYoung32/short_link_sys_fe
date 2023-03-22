@@ -53,7 +53,7 @@ const actions = {
                 console.log(this.cpuUsageRatioLastSec);
             });
     },
-    async fetchRealTimeServerInfo() {
+    async fetchRealtimeServerInfo() {
         const socket = new WebSocket('ws://localhost:8081/server/info_1s');
 
         let failCount = 0;

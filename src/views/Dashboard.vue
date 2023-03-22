@@ -34,7 +34,7 @@ const {mbToGb} = storeToRefs(serverStore);
 
 serverStore.fetchServerStaticInfo();
 
-serverStore.fetchRealTimeServerInfo();
+serverStore.fetchRealtimeServerInfo();
 
 
 const lineOptions = ref(options);

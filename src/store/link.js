@@ -32,7 +32,7 @@ const actions = {
     },
 
     async fetchLinks(amount) {
-        axios.get(`/link/detail?amount=${amount}`).then(response => {
+        axios.get(`/link/details?amount=${amount}`).then(response => {
             this.links = response.data.links;
         });
     },
