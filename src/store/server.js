@@ -5,6 +5,7 @@
 
 import axios from "@/service/net";
 import {defineStore} from "pinia";
+import {Mutex} from "async-mutex";
 
 const state = () => {
     return {
@@ -31,7 +32,9 @@ const state = () => {
         diskUsageRatioLastMin: [], //首次获取后，以后从diskUsageRatioLastSec叠加
         diskUsageRatioLast48Hours: [],
 
-        ttlLast48Hours: []
+        ttlLast48Hours: [],
+
+        wsInvokeTimes: 0,
     };
 };
 
@@ -56,25 +59,47 @@ const actions = {
                 console.log(this.cpuUsageRatioLastSec);
             });
     },
-    async fetchRealtimeServerInfo() {
-        const socket = new WebSocket('ws://localhost:8081/server/info1S');
 
-        let failCount = 0;
-        let isChecked = false;
-        console.log(this.cpuUsageRatioLastSec);
+    async fetchRealtimeServerInfo() {
+        // 确保全局只调用该函数一次, 否则多个websocket同时运行
+        // if (this.wsInvokeTimes > 0) {
+        //     return;
+        // }
+        this.wsInvokeTimes++;
+
+        // 用于控制ws连接超时, 最多 maxReconnectCount*reconnectIntervalMS 毫秒后会确认断开, 不会重连
+        const maxReconnectCount = 10;
+        const reconnectIntervalMS = 1000;
+
         const objThis = this;
 
         function wsConnect() {
-            //debug
-            socket.addEventListener('open', () => {
-                console.log('WebSocket connection established');
-            });
+            const socket = new WebSocket('ws://localhost:8081/server/info1S');
 
+            let failCount = 0;
+            const failCountMutex = new Mutex();// failCount的互斥锁
+            let isChecked = false;             // 用于标记是否已经检查过连接状态, 以便在close事件中判断是否需要重连
+
+            //debug
+            // socket.addEventListener('open', () => {
+            //     console.log('WebSocket connection established');
+            // });
+
+            socket.addEventListener('error', (error) => {
+                console.error('WebSocket error:', error);
+            });
 
             socket.addEventListener('message', (event) => {
                 const info = JSON.parse(event.data);
+
+                failCountMutex.acquire().then((release) => {
+                    console.log("0 in");
+                    failCount = 0;
+                    release();
+                });
+
                 console.log(info);
-                failCount = 0;
+                objThis.isOnline = true;
                 objThis.cpuUsageRatioLastSec = info.cpuUsageRatioLastSec;
                 objThis.memUsageRatioLastSec = info.memUsageRatioLastSec;
                 objThis.diskUsageRatioLastSec = info.diskUsageRatioLastSec;
@@ -82,31 +107,30 @@ const actions = {
 
             // 不允许server主动关闭连接
             socket.addEventListener('close', () => {
-                console.log('WebSocket connection closed');
                 // 若server主动关闭连接, 则0.5秒后尝试重连, 最终在setInterval控制下超时结束
                 if (!isChecked) {
-                    setTimeout(wsConnect, 500);
+                    setTimeout(wsConnect, reconnectIntervalMS);
                 }
             });
 
-            // 每秒积累failCount, 若消息收到则failCount清零, 若5秒内未收到消息则认为server已离线
+            // 该函数永久执行, 每秒积累failCount, 若消息收到则failCount清零, 若5秒后未收到消息则认为server已离线
             const interval = setInterval(() => {
-                failCount++;
-                if (failCount >= 5) {
-                    console.log('Server is offline');
-                    isChecked = true;
-                    socket.close();
-                    clearInterval(interval);
-                }
+                // 互斥访问failCount
+                failCountMutex.acquire().then((release) => {
+                    console.log("add in");
+                    failCount++;
+                    if (failCount >= maxReconnectCount) {
+                        isChecked = true; // 确认断开
+                        socket.close();
+                        clearInterval(interval);
+                    }
+                    release();
+                });
             }, 1000);
+
         }
 
         wsConnect();
-
-        // debug
-        socket.addEventListener('error', (error) => {
-            console.error('WebSocket error:', error);
-        });
     },
 
     async fetchCInfoLastXHour(x) {
