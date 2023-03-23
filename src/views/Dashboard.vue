@@ -1,7 +1,7 @@
 <script setup>
 /**
  * Created by YuYoung on 2023/3/20
- * Description: 主页Dashboard页面
+ * Description: Dashboard
  */
 import {ref, reactive} from 'vue';
 import {storeToRefs} from "pinia";

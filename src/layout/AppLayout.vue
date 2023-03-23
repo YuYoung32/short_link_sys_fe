@@ -4,9 +4,9 @@
  * Description: 主页布局
  */
 import {computed, watch, ref} from 'vue';
-import AppTopbar from './component/AppTopbar';
-import AppSidebar from './component/AppSidebar';
-import {useLayout} from './layout';
+import AppTopbar from '@/layout/component/AppTopbar';
+import AppSidebar from '@/layout/component/AppSidebar';
+import {useLayout} from '@/layout/layout';
 
 const {layoutConfig, layoutState, isSidebarActive} = useLayout();
 
