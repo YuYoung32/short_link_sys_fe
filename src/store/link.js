@@ -26,7 +26,7 @@ const getters = {};
 
 const actions = {
     async fetchLinksTotal() {
-        axios.get('/link/amount_total').then(response => {
+        axios.get('/link/amountTotal').then(response => {
             this.amountTotal = response.data.amountTotal;
         });
     },
@@ -38,7 +38,7 @@ const actions = {
     },
 
     async deleteLink(short_link) {
-        axios.get(`/link/del?short_link=${short_link}`).then(response => {
+        axios.get(`/link/del?shortLink=${short_link}`).then(response => {
             if (response.data.code === '200') {
                 return true;
             } else {
@@ -50,7 +50,7 @@ const actions = {
     },
 
     async addLink(long_link) {
-        axios.post('/link', {long_link}).then(response => {
+        axios.post('/link', {"longLink": long_link}).then(response => {
             if (response.data.code === '200') {
                 return true;
             } else {

@@ -8,20 +8,13 @@ import axios from "axios";
 
 const state = () => {
     return {
+        xHourTimePoints: [],
         visitAmountLastXHour: [],
+
         visitIPLastXHour: [],
+
         visitAmountLastXHourTotal: 0,
-        /**
-         * 单个visitDetail结构
-         {
-            longUrl: "http://example.com/long-url",
-            shortUrl: "http://example.com/short-url",
-            IP: "192.168.0.1",
-            region: "US",
-            OS: "Windows 10",
-            timestamp: "2023-03-22T08:50:14.349Z"
-         }
-         */
+        
         visitDetails: [],
     };
 };
@@ -30,19 +23,19 @@ const getters = {};
 
 const actions = {
     async fetchVisitAmountXhr(x) {
-        axios.get(`/visit/amount_xhr?x=${x}`)
+        axios.get(`/visit/amountXhr?x=${x}`)
             .then(response => {
                 this.visitAmountLastXHour = response.data.visitAmountLastXHour;
             });
     },
     async fetchVisitIpXhr(x) {
-        axios.get(`/visit/ip_xhr?x=${x}`)
+        axios.get(`/visit/ipXhr?x=${x}`)
             .then(response => {
                 this.visitIPLastXHour = response.data.visitIPLastXHour;
             });
     },
     async fetchVisitAmountXHourTotal(x) {
-        axios.get(`/visit/amount_xhr_total?x=${x}`)
+        axios.get(`/visit/amountXhrTotal?x=${x}`)
             .then(response => {
                 this.visitAmountLastXHourTotal = response.data.visitAmountLastXHourTotal;
             });

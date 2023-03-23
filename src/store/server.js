@@ -12,23 +12,26 @@ const state = () => {
         memTotalSize: 0,
         diskTotalSize: 0,
 
+        xHourTimePoints: [],
+        cpuUsageRatioLastXHour: [],
+        memUsageRatioLastXHour: [],
+        diskUsageRatioLastXHour: [],
+        ttlLastXHour: [],
+
+
         cpuUsageRatioLastSec: 0,
         cpuUsageRatioLastMin: [], //首次获取后，以后从cpuUsageRatioLastSec叠加
-        cpuUsageRatioLastXHour: [],
-        cpuUsageRatioLastXDay: [],
+        cpuUsageRatioLast48Hours: [],
 
         memUsageRatioLastSec: 0,
         memUsageRatioLastMin: [], //首次获取后，以后从memUsageRatioLastSec叠加
-        memUsageRatioLastXHour: [],
-        memUsageRatioLastXDay: [],
+        memUsageRatioLast48Hours: [],
 
         diskUsageRatioLastSec: 0,
         diskUsageRatioLastMin: [], //首次获取后，以后从diskUsageRatioLastSec叠加
-        diskUsageRatioLastXHour: [],
-        diskUsageRatioLastXDay: [],
+        diskUsageRatioLast48Hours: [],
 
-        ttlLastXHour: [],
-        ttlLastXDay: []
+        ttlLast48Hours: []
     };
 };
 
@@ -43,7 +46,7 @@ const getters = {
 
 const actions = {
     async fetchServerStaticInfo() {
-        axios.get('/server/static_info')
+        axios.get('/server/staticInfo')
             .then(response => {
                 console.log(response.data);
                 this.memTotalSize = response.data.memTotalSize;
@@ -54,7 +57,7 @@ const actions = {
             });
     },
     async fetchRealtimeServerInfo() {
-        const socket = new WebSocket('ws://localhost:8081/server/info_1s');
+        const socket = new WebSocket('ws://localhost:8081/server/info1S');
 
         let failCount = 0;
         let isChecked = false;
@@ -106,59 +109,31 @@ const actions = {
         });
     },
 
-    // CPU
-    async fetchCpuUsageRatioLastXHour(x) {
-        axios.get(`/server/cpu_xhr?x=${x}`)
+    async fetchCInfoLastXHour(x) {
+        axios.get(`/server/InfoXhr?x=${x}`)
             .then(response => {
-                this.cpuUsageRatioLastXHour = response.data.ratios;
-            });
-    },
-    async fetchCpuUsageRatioLastXDay(x) {
-        axios.get(`/server/cpu_xhr?x=${x * 24}`)
-            .then(response => {
-                this.cpuUsageRatioLastXDay = response.data.ratios;
-            });
-    },
-
-    // MEM
-    async fetchMemUsageRatioLastXHour(x) {
-        axios.get(`/server/mem_xhr?x=${x}`)
-            .then(response => {
-                this.memUsageRatioLastXHour = response.data.ratios;
-            });
-    },
-    async fetchMemUsageRatioLastXDay(x) {
-        axios.get(`/server/mem_xhr?x=${x * 24}`)
-            .then(response => {
-                this.memUsageRatioLastXDay = response.data.ratios;
+                this.cpuUsageRatioLastXHour = response.data.cpuUsageRatioLastXHour;
+                this.memUsageRatioLastXHour = response.data.memUsageRatioLastXHour;
+                this.diskUsageRatioLastXHour = response.data.diskUsageRatioLastXHour;
+                this.ttlLastXHour = response.data.ttlLastXHour;
+                this.xHourTimePoints = response.data.xHourTimePoints;
+                if (x === 48) {
+                    this.cpuUsageRatioLast48Hours = response.data.cpuUsageRatioLastXHour;
+                    this.memUsageRatioLast48Hours = response.data.memUsageRatioLastXHour;
+                    this.diskUsageRatioLast48Hours = response.data.diskUsageRatioLastXHour;
+                    this.ttlLast48Hours = response.data.ttlLastXHour;
+                }
             });
     },
 
-    // DISK
-    async fetchDiskUsageRatioLastXHour(x) {
-        axios.get(`/server/disk_xhr?x=${x}`)
+    async fetchCInfoLastXMin() {
+        axios.get('/server/info1Min')
             .then(response => {
-                this.diskUsageRatioLastXHour = response.data.ratios;
+                this.cpuUsageRatioLastMin = response.data.cpuUsageRatioLastMin;
+                this.memUsageRatioLastMin = response.data.memUsageRatioLastMin;
+                this.diskUsageRatioLastMin = response.data.diskUsageRatioLastMin;
             });
-    },
-    async fetchDiskUsageRatioLastXDay(x) {
-        axios.get(`/server/disk_xhr?x=${x * 24}`)
-            .then(response => {
-                this.diskUsageRatioLastXDay = response.data.ratios;
-            });
-    },
 
-    async fetchTtlLastXHour(x) {
-        axios.get(`/server/ttl_xhr?x=${x}`)
-            .then(response => {
-                this.ttlLastXHour = response.data.ttls;
-            });
-    },
-    async fetchTtlLastXDay(x) {
-        axios.get(`/server/ttl_xhr?x=${x * 24}`)
-            .then(response => {
-                this.ttlLastDay = response.data.ttls;
-            });
     }
 };
 
