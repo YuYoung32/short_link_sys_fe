@@ -4,7 +4,7 @@
  */
 
 import {defineStore} from "pinia";
-import axios from "axios";
+import axios from "@/service/net";
 
 const state = () => {
     return {
@@ -13,8 +13,9 @@ const state = () => {
 
         visitIPLastXHour: [],
 
-        visitAmountLastXHourTotal: 0,
-        
+        visitAmountLast24HourTotal: '-',
+        visitAmountLastXHourTotal: '-',
+
         visitDetails: [],
     };
 };
@@ -23,10 +24,14 @@ const getters = {};
 
 const actions = {
     async fetchVisitAmountXhr(x) {
-        axios.get(`/visit/amountXhr?x=${x}`)
-            .then(response => {
-                this.visitAmountLastXHour = response.data.visitAmountLastXHour;
-            });
+        try {
+            const response = await axios.get(`/visit/amountXhr?x=${x}`);
+            this.visitAmountLastXHour = response.data.amount;
+            this.xHourTimePoints = response.data.xHourTimePoints;
+            // return response.data.amountTotal;
+        } catch (e) {
+            console.error(e);
+        }
     },
     async fetchVisitIpXhr(x) {
         axios.get(`/visit/ipXhr?x=${x}`)
@@ -35,10 +40,15 @@ const actions = {
             });
     },
     async fetchVisitAmountXHourTotal(x) {
-        axios.get(`/visit/amountXhrTotal?x=${x}`)
-            .then(response => {
-                this.visitAmountLastXHourTotal = response.data.visitAmountLastXHourTotal;
-            });
+        try {
+            const response = await axios.get(`/visit/amountXhrTotal?x=${x}`);
+            if (x === 24) {
+                this.visitAmountLast24HourTotal = response.data.amountTotal;
+            }
+            return response.data.amountTotal;
+        } catch (e) {
+            console.error(e);
+        }
     },
     async fetchVisitDetails(amount) {
         axios.get(`/visit/details?amount=${amount}`)

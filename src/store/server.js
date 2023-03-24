@@ -7,6 +7,23 @@ import axios from "@/service/net";
 import {defineStore} from "pinia";
 import {Mutex} from "async-mutex";
 
+/**
+ * 从数组头部删除一个元素，从数组尾部添加一个元素
+ * @param arr
+ * @param val
+ */
+function pushAndPop(arr, val) {
+    for (let i = 0; i < arr.length; i++) {
+        if (i === arr.length - 1) {
+            arr[i] = val;
+        } else {
+            arr[i] = arr[i + 1];
+        }
+    }
+}
+
+
+
 const state = () => {
     return {
         isOnline: false,
@@ -18,7 +35,6 @@ const state = () => {
         memUsageRatioLastXHour: [],
         diskUsageRatioLastXHour: [],
         ttlLastXHour: [],
-
 
         cpuUsageRatioLastSec: 0,
         cpuUsageRatioLastMin: [], //首次获取后，以后从cpuUsageRatioLastSec叠加
@@ -44,6 +60,9 @@ const getters = {
             memTotalSize: (state.memTotalSize / 1024).toFixed(2),
             diskTotalSize: (state.diskTotalSize / 1024).toFixed(2)
         };
+    },
+    avgCPURatioLastMin: (state) => {
+        return (state.cpuUsageRatioLastMin.reduce((a, b) => a + b, 0) / state.cpuUsageRatioLastMin.length).toFixed(2);
     }
 };
 
@@ -51,20 +70,16 @@ const actions = {
     async fetchServerStaticInfo() {
         axios.get('/server/staticInfo')
             .then(response => {
-                console.log(response.data);
                 this.memTotalSize = response.data.memTotalSize;
                 this.diskTotalSize = response.data.diskTotalSize;
-                console.log(this.memTotalSize);
-                console.log(this.diskTotalSize);
-                console.log(this.cpuUsageRatioLastSec);
             });
     },
 
     async fetchRealtimeServerInfo() {
         // 确保全局只调用该函数一次, 否则多个websocket同时运行
-        // if (this.wsInvokeTimes > 0) {
-        //     return;
-        // }
+        if (this.wsInvokeTimes > 0) {
+            return;
+        }
         this.wsInvokeTimes++;
 
         // 用于控制ws连接超时, 最多 maxReconnectCount*reconnectIntervalMS 毫秒后会确认断开, 不会重连
@@ -93,16 +108,17 @@ const actions = {
                 const info = JSON.parse(event.data);
 
                 failCountMutex.acquire().then((release) => {
-                    console.log("0 in");
                     failCount = 0;
+                    objThis.isOnline = true;
                     release();
                 });
 
-                console.log(info);
-                objThis.isOnline = true;
                 objThis.cpuUsageRatioLastSec = info.cpuUsageRatioLastSec;
+                pushAndPop(objThis.cpuUsageRatioLastMin, info.cpuUsageRatioLastSec);
                 objThis.memUsageRatioLastSec = info.memUsageRatioLastSec;
+                pushAndPop(objThis.memUsageRatioLastMin, info.memUsageRatioLastSec);
                 objThis.diskUsageRatioLastSec = info.diskUsageRatioLastSec;
+                pushAndPop(objThis.diskUsageRatioLastMin, info.diskUsageRatioLastSec);
             });
 
             // 不允许server主动关闭连接
@@ -117,10 +133,10 @@ const actions = {
             const interval = setInterval(() => {
                 // 互斥访问failCount
                 failCountMutex.acquire().then((release) => {
-                    console.log("add in");
                     failCount++;
                     if (failCount >= maxReconnectCount) {
                         isChecked = true; // 确认断开
+                        objThis.isOnline = false;
                         socket.close();
                         clearInterval(interval);
                     }
@@ -133,7 +149,7 @@ const actions = {
         wsConnect();
     },
 
-    async fetchCInfoLastXHour(x) {
+    async fetchInfoLastXHour(x) {
         axios.get(`/server/InfoXhr?x=${x}`)
             .then(response => {
                 this.cpuUsageRatioLastXHour = response.data.cpuUsageRatioLastXHour;
@@ -150,13 +166,15 @@ const actions = {
             });
     },
 
-    async fetchCInfoLastXMin() {
-        axios.get('/server/info1Min')
-            .then(response => {
-                this.cpuUsageRatioLastMin = response.data.cpuUsageRatioLastMin;
-                this.memUsageRatioLastMin = response.data.memUsageRatioLastMin;
-                this.diskUsageRatioLastMin = response.data.diskUsageRatioLastMin;
-            });
+    async fetchInfoLast1Min() {
+        try {
+            const response = await axios.get('/server/info1Min');
+            this.cpuUsageRatioLastMin = response.data.cpuUsageRatioLastMin;
+            this.memUsageRatioLastMin = response.data.memUsageRatioLastMin;
+            this.diskUsageRatioLastMin = response.data.diskUsageRatioLastMin;
+        } catch (e) {
+            console.error(e);
+        }
 
     }
 };

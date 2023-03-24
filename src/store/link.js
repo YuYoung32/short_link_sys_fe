@@ -4,19 +4,10 @@
  */
 
 import {defineStore} from 'pinia';
-import axios from 'axios';
+import axios from "@/service/net";
 
 const state = () => {
     return {
-        /**
-         * 单个link结构
-         {
-            shortLink: '',
-            longLink: '',
-            createTime: '',
-         }
-         *
-         */
         links: [],
         amountTotal: 0,
     };
@@ -25,7 +16,7 @@ const state = () => {
 const getters = {};
 
 const actions = {
-    async fetchLinksTotal() {
+    async fetchLinksAmountTotal() {
         axios.get('/link/amountTotal').then(response => {
             this.amountTotal = response.data.amountTotal;
         });
