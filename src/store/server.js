@@ -5,7 +5,6 @@
 
 import axios from "@/service/net";
 import {defineStore} from "pinia";
-import {Mutex} from "async-mutex";
 
 /**
  * 从数组头部删除一个元素，从数组尾部添加一个元素
@@ -21,7 +20,6 @@ function pushAndPop(arr, val) {
         }
     }
 }
-
 
 
 const state = () => {
@@ -88,12 +86,10 @@ const actions = {
 
         const objThis = this;
 
+        let failCount = 0;
+
         function wsConnect() {
             const socket = new WebSocket('ws://localhost:8081/server/info1S');
-
-            let failCount = 0;
-            const failCountMutex = new Mutex();// failCount的互斥锁
-            let isChecked = false;             // 用于标记是否已经检查过连接状态, 以便在close事件中判断是否需要重连
 
             //debug
             // socket.addEventListener('open', () => {
@@ -107,11 +103,8 @@ const actions = {
             socket.addEventListener('message', (event) => {
                 const info = JSON.parse(event.data);
 
-                failCountMutex.acquire().then((release) => {
-                    failCount = 0;
-                    objThis.isOnline = true;
-                    release();
-                });
+                failCount = 0;
+                objThis.isOnline = true;
 
                 objThis.cpuUsageRatioLastSec = info.cpuUsageRatioLastSec;
                 pushAndPop(objThis.cpuUsageRatioLastMin, info.cpuUsageRatioLastSec);
@@ -124,26 +117,14 @@ const actions = {
             // 不允许server主动关闭连接
             socket.addEventListener('close', () => {
                 // 若server主动关闭连接, 则0.5秒后尝试重连, 最终在setInterval控制下超时结束
-                if (!isChecked) {
+                if (failCount < maxReconnectCount) {
+                    failCount++;
+                    objThis.isOnline = false;
                     setTimeout(wsConnect, reconnectIntervalMS);
+                } else {
+                    socket.close();
                 }
             });
-
-            // 该函数永久执行, 每秒积累failCount, 若消息收到则failCount清零, 若5秒后未收到消息则认为server已离线
-            const interval = setInterval(() => {
-                // 互斥访问failCount
-                failCountMutex.acquire().then((release) => {
-                    failCount++;
-                    if (failCount >= maxReconnectCount) {
-                        isChecked = true; // 确认断开
-                        objThis.isOnline = false;
-                        socket.close();
-                        clearInterval(interval);
-                    }
-                    release();
-                });
-            }, 1000);
-
         }
 
         wsConnect();
