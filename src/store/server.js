@@ -25,8 +25,8 @@ function pushAndPop(arr, val) {
 const state = () => {
     return {
         isOnline: false,
-        memTotalSize: 0,
-        diskTotalSize: 0,
+        memTotalSize: '-',
+        diskTotalSize: '-',
 
         xHourTimePoints: [],
         cpuUsageRatioLastXHour: [],

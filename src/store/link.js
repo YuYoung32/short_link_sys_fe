@@ -9,7 +9,7 @@ import axios from "@/service/net";
 const state = () => {
     return {
         links: [],
-        amountTotal: 0,
+        amountTotal: '-',
     };
 };
 
