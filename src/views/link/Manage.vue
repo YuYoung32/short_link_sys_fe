@@ -4,7 +4,7 @@
  * Description: 短链管理
  */
 import {FilterMatchMode} from 'primevue/api';
-import {onBeforeMount, ref,} from 'vue';
+import {onBeforeMount, ref, watch} from 'vue';
 import {useToast} from 'primevue/usetoast';
 import {useLinkStore} from '@/store/link';
 import {storeToRefs} from "pinia";
@@ -13,11 +13,6 @@ import {getArrIndexByEle} from "@/service/utils";
 const linkStore = useLinkStore();
 const toast = useToast();
 const {links} = storeToRefs(linkStore); // DataTable数据
-
-// Dialog可见性
-const editDialogVisible = ref(false);
-const deleteDialogVisible = ref(false);
-
 const dt = ref(null); // 引用整个数据表格，用于导出
 
 const link = ref({}); // 暂存单个信息编辑/新增时使用
@@ -35,6 +30,7 @@ onBeforeMount(() => {
 linkStore.fetchLinks(50);
 
 //region 编辑/新建Dialog
+const editDialogVisible = ref(false);
 const openEditDialog = (linkItem) => {
   if (linkItem) {
     // 更新
@@ -84,14 +80,26 @@ const confirmEditDialog = () => {
 //endregion
 
 //region 删除Dialog
+const deleteSelectButtonStyle = ref('background-color: #AA3F3FFF;border: 1px solid #AA3F3FFF;');
+const deleteDialogVisible = ref(false);
+watch(selectedLinks, (val) => {
+  if (val && val.length > 0) {
+    deleteSelectButtonStyle.value = 'background-color: #EF4444;border: 1px solid #EF4444;';
+  } else {
+    deleteSelectButtonStyle.value = 'background-color: #AA3F3FFF;border: 1px solid #AA3F3FFF;';
+  }
+});
 const openDeleteDialog = (linkItem) => {
   if (linkItem) {
     toDeleteLinks.value = [linkItem];
-  } else {
+    deleteDialogVisible.value = true;
+  } else if (selectedLinks.value && selectedLinks.value.length > 0) {
     console.log(selectedLinks.value);
     toDeleteLinks.value = links.value.filter((val) => selectedLinks.value.includes(val));
+    deleteDialogVisible.value = true;
+  } else {
+    toast.add({severity: 'error', summary: '失败', detail: '请选择要删除的链接', life: 3000});
   }
-  deleteDialogVisible.value = true;
 };
 // 删除Dialog-取消
 const cancelDeleteDialog = () => {
@@ -133,7 +141,7 @@ const initFilters = () => {
             <div class="my-2">
               <Button label="新增" icon="pi pi-plus" class="p-button-success mr-2" @click="openEditDialog"/>
               <Button label="删除" icon="pi pi-trash" class="p-button-danger" @click="openDeleteDialog()"
-                      :disabled="!selectedLinks || !selectedLinks.length"/>
+                      :style="deleteSelectButtonStyle"/>
             </div>
           </template>
           <template v-slot:end>
@@ -244,7 +252,7 @@ const initFilters = () => {
 
 
           <template #footer>
-            <Button label="取消" icon="pi pi-times" class="p-button-text" @click="cancelDeleteDialog"/>
+            <Button label="取消" icon="pi pi-times" class="p-button-text" @click="cancelDeleteDialog" onfocus/>
             <Button label="确认" icon="pi pi-check" class="p-button-text" @click="confirmDeleteLink"/>
           </template>
         </Dialog>
