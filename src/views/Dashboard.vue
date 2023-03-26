@@ -6,7 +6,7 @@
 
 import {storeToRefs} from "pinia";
 import {useServerStore} from "@/store/server";
-import {useLinksStore} from "@/store/link";
+import {useLinkStore} from "@/store/link";
 import {useVisitStore} from "@/store/visit";
 import DataShowCard from "@/components/DataShowCard";
 import Cpu1MinLineChart from "@/components/Cpu1MinLineChart";
@@ -15,7 +15,7 @@ import {dateObjToString} from "@/service/utils";
 
 
 const serverStore = useServerStore();
-const linkStore = useLinksStore();
+const linkStore = useLinkStore();
 const visitStore = useVisitStore();
 
 const {isOnline, avgCPURatioLastMin} = storeToRefs(serverStore);

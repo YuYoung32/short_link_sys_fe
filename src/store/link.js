@@ -8,6 +8,13 @@ import axios from "@/service/net";
 
 const state = () => {
     return {
+        /** 短链信息 单个结构
+         {
+            shortLink: "http://localhost:8080/1",
+            longLink: "https://www.baidu.com",
+            createTime: "2021-03-22 15:00:00",
+         }
+         */
         links: [],
         amountTotal: '-',
     };
@@ -53,7 +60,7 @@ const actions = {
     }
 };
 
-export const useLinksStore = defineStore('link', {
+export const useLinkStore = defineStore('link', {
     state,
     getters,
     actions
