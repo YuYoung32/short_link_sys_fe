@@ -38,5 +38,21 @@ function getTodayDayValue() {
     return new Date().getDate();
 }
 
+/**
+ * 获取数组中某个元素的索引
+ * @param ele 要查找的元素
+ * @param arr 数组
+ * @param key 数组中元素的key
+ * @returns {number}
+ */
+function getArrIndexByEle(ele, arr, key) {
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[key] === ele) {
+            return i;
+        }
+    }
+    return -1; // 如果未找到该元素，则返回 -1
+}
 
-export {dateObjToString, pushAndPop, getTodayDayValue};
+
+export {dateObjToString, pushAndPop, getTodayDayValue, getArrIndexByEle};

@@ -14,10 +14,18 @@ import StyleClass from "primevue/styleclass";
 import Chart from 'primevue/chart';
 import Card from 'primevue/card';
 
-
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
-
+import Toast from 'primevue/toast';
+import FileUpload from "primevue/fileupload";
+import Toolbar from "primevue/toolbar";
+import Column from "primevue/column";
+import DataTable from "primevue/datatable";
+import Textarea from "primevue/textarea";
+import Dropdown from "primevue/dropdown";
+import RadioButton from "primevue/radiobutton";
+import InputNumber from "primevue/inputnumber";
+import Dialog from "primevue/dialog";
 
 // import localization from "/src/localization";
 import "@/assets/styles.scss";
@@ -40,6 +48,16 @@ app.component("Button", Button);
 app.component("InputText", InputText);
 app.component("Chart", Chart);
 app.component("Card", Card);
+app.component("Toast", Toast);
+app.component("FileUpload", FileUpload);
+app.component("Toolbar", Toolbar);
+app.component("Column", Column);
+app.component("DataTable", DataTable);
+app.component("Textarea", Textarea);
+app.component("Dropdown", Dropdown);
+app.component("RadioButton", RadioButton);
+app.component("InputNumber", InputNumber);
+app.component("Dialog", Dialog);
 
 app.use(createPinia());
 app.use(router);

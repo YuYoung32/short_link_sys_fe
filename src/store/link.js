@@ -13,6 +13,7 @@ const state = () => {
             shortLink: "http://localhost:8080/1",
             longLink: "https://www.baidu.com",
             createTime: "2021-03-22 15:00:00",
+            comment: "百度",
          }
          */
         links: [],
@@ -31,12 +32,34 @@ const actions = {
 
     async fetchLinks(amount) {
         axios.get(`/link/details?amount=${amount}`).then(response => {
-            this.links = response.data.links;
+            this.links = response.data;
         });
     },
 
-    async deleteLink(short_link) {
-        axios.get(`/link/del?shortLink=${short_link}`).then(response => {
+    async deleteLink(linkDataList) {
+        const data = {
+            'shortLinks': linkDataList.map((linkData) => {
+                return linkData.shortLink;
+            })
+        };
+        axios.post(`/link/del`, data).then(response => {
+            if (response.data.code === '200') {
+                return true;
+            } else {
+                throw response.data.msg;
+            }
+        }).catch((msg) => {
+            console.error(msg);
+            return msg;
+        });
+    },
+
+    async addLink(linkData) {
+        const sendData = {
+            'longLink': linkData.longLink,
+            'comment': linkData.comment
+        };
+        axios.post('/link/add', sendData).then(response => {
             if (response.data.code === '200') {
                 return true;
             } else {
@@ -47,8 +70,13 @@ const actions = {
         });
     },
 
-    async addLink(long_link) {
-        axios.post('/link', {"longLink": long_link}).then(response => {
+    async updateLink(linkData) {
+        const sendData = {
+            'shortLink': linkData.shortLink,
+            'longLink': linkData.longLink,
+            'comment': linkData.comment
+        };
+        axios.post('/link/update', sendData).then(response => {
             if (response.data.code === '200') {
                 return true;
             } else {
