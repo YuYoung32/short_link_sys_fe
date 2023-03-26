@@ -4,32 +4,43 @@
  * Description: 时间访问量柱状图
  */
 
-import {reactive} from "vue";
-import {storeToRefs} from "pinia/dist/pinia";
+import {reactive, defineProps, watchEffect} from "vue";
 import {useVisitStore} from "@/store/visit";
+import {storeToRefs} from "pinia";
 
 const visitStore = useVisitStore();
 
-const {xHourTimePoints, visitAmountLastXHour} = storeToRefs(visitStore);
+const {visitAmountLastBetween} = storeToRefs(visitStore);
 
-visitStore.fetchVisitAmountXhr(24);
+const props = defineProps(['title', 'begin', 'end']);
+const titleRef = reactive(props.title);
+
+const xData = reactive([]);
+
+watchEffect(async () => {
+  await visitStore.fetchVisitAmountLastBetween(props.begin, props.end);
+  xData.splice(0, xData.length);
+  for (let i = props.begin; i <= props.end; i++) {
+    xData.push(i);
+  }
+});
 
 
 const data = reactive({
-  labels: xHourTimePoints,
+  labels: xData,
   datasets: [
     {
-      data: visitAmountLastXHour,
+      data: visitAmountLastBetween,
       fill: true,
-      borderColor: 'rgba(255,0,0,0.72)',
-      backgroundColor: 'rgba(255,0,0,0.36)',
+      borderColor: '#6366F1',
+      backgroundColor: '#6366F1',
       borderWidth: 1,
     }
   ]
 });
 
 const options = {
-  animation: false,
+  animation: true,
   maintainAspectRatio: false, // 是否保持长宽比
   plugins: {
     legend: {
@@ -43,7 +54,7 @@ const options = {
 <template>
   <div class="col-12 xl:col-6">
     <div class="card">
-      <h5>24小时访问时段图</h5>
+      <h5>{{ titleRef }}</h5>
       <Chart type="bar" :data=data :options="options" class="h-20rem"/>
     </div>
   </div>

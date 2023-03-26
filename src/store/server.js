@@ -5,21 +5,7 @@
 
 import axios from "@/service/net";
 import {defineStore} from "pinia";
-
-/**
- * 从数组头部删除一个元素，从数组尾部添加一个元素
- * @param arr
- * @param val
- */
-function pushAndPop(arr, val) {
-    for (let i = 0; i < arr.length; i++) {
-        if (i === arr.length - 1) {
-            arr[i] = val;
-        } else {
-            arr[i] = arr[i + 1];
-        }
-    }
-}
+import {pushAndPop} from "@/service/utils";
 
 
 const state = () => {
