@@ -55,11 +55,7 @@ const actions = {
     },
 
     async addLink(linkData) {
-        const sendData = {
-            'longLink': linkData.longLink,
-            'comment': linkData.comment
-        };
-        axios.post('/link/add', sendData).then(response => {
+        axios.post('/link/add', linkData).then(response => {
             if (response.data.code === '200') {
                 return true;
             } else {

@@ -8,41 +8,32 @@ import {onBeforeMount, ref, watch} from 'vue';
 import {useToast} from 'primevue/usetoast';
 import {useLinkStore} from '@/store/link';
 import {storeToRefs} from "pinia";
-import {getArrIndexByEle} from "@/service/utils";
+import {getArrIndexByEle, unixTimeToString} from "@/service/utils";
 
 const linkStore = useLinkStore();
-const toast = useToast();
+const toast = useToast(); // 弹窗实例
 const {links} = storeToRefs(linkStore); // DataTable数据
-const dt = ref(null); // 引用整个数据表格，用于导出
-
-const link = ref({}); // 暂存单个信息编辑/新增时使用
-const editDialogSubmitType = ref(''); // 提交类型: add-新增, update-更新
-const submitted = ref(false); // 表单是否提交, 避免重复点击
-
-const toDeleteLinks = ref([]); // 存储待删除链接的shortLink
-const selectedLinks = ref(null); // 选中的数据
-const filters = ref({});
-
-onBeforeMount(() => {
-  initFilters();
-});
-
-linkStore.fetchLinks(50);
 
 //region 编辑/新建Dialog
+const newLink = ref({}); // 暂存单个信息编辑/新增时使用
+const editDialogSubmitType = ref(''); // 提交类型: add-新增, update-更新
+const submitted = ref(false); // 表单是否提交, 用于编辑链接时验证
+const editDialogHeader = ref('新增链接');
 const editDialogVisible = ref(false);
 const openEditDialog = (linkItem) => {
-  if (linkItem) {
+  if (linkItem && linkItem.shortLink) {
     // 更新
-    link.value = {...linkItem};
+    editDialogHeader.value = '更新链接';
+    newLink.value = {...linkItem};
     editDialogSubmitType.value = 'update';
   } else {
     // 新增
-    link.value = {};
+    editDialogHeader.value = '新增链接';
+    newLink.value = [];
     editDialogSubmitType.value = 'add';
   }
-  submitted.value = false;
-  editDialogVisible.value = true;
+  submitted.value = false;       //防止重复点击
+  editDialogVisible.value = true;//显示Dialog
 };
 // 编辑/新建Dialog-取消
 const cancelEditDialog = () => {
@@ -52,10 +43,11 @@ const cancelEditDialog = () => {
 // 编辑/新建Dialog-确认
 const confirmEditDialog = () => {
   submitted.value = true;
-  if (link.value.longLink.trim() && link.value.comment.trim()) {
+  if (newLink.value.longLink && newLink.value.longLink.trim() && newLink.value.comment.trim()) {
+    // 更新
     if (editDialogSubmitType.value === 'update') {
-      links.value[getArrIndexByEle(link.value.shortLink, links.value, 'shortLink')] = link.value;
-      linkStore.updateLink(link.value).then(res => {
+      links.value[getArrIndexByEle(newLink.value.shortLink, links.value, 'shortLink')] = newLink.value;
+      linkStore.updateLink(newLink.value).then(res => {
         if (res === true) {
           toast.add({severity: 'success', summary: '成功', detail: '链接更新成功', life: 3000});
         } else {
@@ -63,7 +55,8 @@ const confirmEditDialog = () => {
         }
       });
     } else {
-      linkStore.addLink(link.value).then(res => {
+      // 新增
+      linkStore.addLink(newLink.value).then(res => {
         if (res === true) {
           linkStore.fetchLinks(50);
           toast.add({severity: 'success', summary: '成功', detail: '链接创建成功', life: 3000});
@@ -74,12 +67,14 @@ const confirmEditDialog = () => {
     }
 
     editDialogVisible.value = false;
-    link.value = {};
+    newLink.value = {};
   }
 };
 //endregion
 
 //region 删除Dialog
+const toDeleteLinks = ref([]); // 存储待删除链接的shortLink
+const selectedLinks = ref(null); // 选中的数据
 const deleteSelectButtonStyle = ref('background-color: #AA3F3FFF;border: 1px solid #AA3F3FFF;');
 const deleteDialogVisible = ref(false);
 watch(selectedLinks, (val) => {
@@ -119,15 +114,64 @@ const confirmDeleteLink = () => {
 };
 //endregion
 
-const exportCSV = () => {
-  dt.value.exportCSV();
-};
+//region 从文件新增Dialog
+const addLinkFromFileDialogVisible = ref(false);
+const newLinks = ref([]);
+const openAddFromFileDialog = (event) => {
+  // 读取文件并存储到newLinks
+  const reader = new FileReader();
+  reader.readAsText(event.files[0]);
+  reader.onload = () => {
+    const lines = reader.result.split(/\r?\n/);
+    newLinks.value = [];
+    for (let i = 0; i < lines.length; i++) {
+      const index = lines[i].indexOf(',');
+      if (index !== -1) {
+        newLinks.value.push({
+          longLink: lines[i].substring(0, index).trim(),
+          comment: lines[i].substring(index + 1).trim()
+        });
+      } else {
+        newLinks.value = [];
+        toast.add({severity: 'error', summary: '失败', detail: '文件格式错误', life: 3000});
+        return;
+      }
+    }
+    // 打开Dialog
+    addLinkFromFileDialogVisible.value = true;
+  };
 
+};
+// 从文件新增Dialog-取消
+const cancelAddFromFileDialog = () => {
+  addLinkFromFileDialogVisible.value = false;
+};
+// 从文件新增Dialog-确认
+const confirmAddFromFileDialog = () => {
+  addLinkFromFileDialogVisible.value = false;
+  linkStore.addLink(newLinks.value).then(res => {
+    if (res === true) {
+      linkStore.fetchLinks(50);
+      toast.add({severity: 'success', summary: '成功', detail: '链接创建成功', life: 3000});
+    } else {
+      toast.add({severity: 'error', summary: '失败', detail: '链接创建失败', life: 3000});
+    }
+  });
+};
+//endregion
+
+const filters = ref({});
 const initFilters = () => {
   filters.value = {
     global: {value: null, matchMode: FilterMatchMode.CONTAINS}
   };
 };
+
+onBeforeMount(() => {
+  initFilters();
+});
+
+linkStore.fetchLinks(50);
 </script>
 
 <template>
@@ -135,25 +179,24 @@ const initFilters = () => {
     <div class="col-12">
       <div class="card">
         <Toast/>
-        <!--头部按钮 新增 删除 文件上传 导出-->
+        <!--头部按钮 新增 删除 文件上传 说明-->
         <Toolbar class="mb-4">
           <template v-slot:start>
             <div class="my-2">
-              <Button label="新增" icon="pi pi-plus" class="p-button-success mr-2" @click="openEditDialog"/>
+              <Button label="新增" icon="pi pi-plus" class="p-button-success mr-2" @click="openEditDialog()"/>
               <Button label="删除" icon="pi pi-trash" class="p-button-danger" @click="openDeleteDialog()"
                       :style="deleteSelectButtonStyle"/>
             </div>
           </template>
           <template v-slot:end>
-            <FileUpload mode="basic" accept="image/*" :maxFileSize="1000000" label="从文件新建" chooseLabel="从文件新增"
-                        class="mr-2 inline-block"/>
-            <Button label="导出" icon="pi pi-file-export" class="p-button-help" @click="exportCSV($event)"/>
+            <FileUpload id="fileUpload" mode="basic" :auto="true" :maxFileSize="1000000" chooseLabel="从文件新增"
+                        customUpload
+                        @uploader="openAddFromFileDialog($event)"/>
           </template>
         </Toolbar>
 
         <!--表格-->
         <DataTable
-            ref="dt"
             :value="links"
             v-model:selection="selectedLinks"
             dataKey="shortLink"
@@ -197,10 +240,10 @@ const initFilters = () => {
               {{ slotProps.data.comment }}
             </template>
           </Column>
-          <Column field="createTime" header="创建时间" headerStyle="width:14%; min-width:4rem;">
+          <Column field="createTime" header="创建时间" headerStyle="width:14%; min-width:8rem;">
             <template #body="slotProps">
               <span class="p-column-title">备注</span>
-              {{ slotProps.data.createTime }}
+              {{ unixTimeToString(slotProps.data.createTime) }}
             </template>
           </Column>
           <!--操作列-->
@@ -215,17 +258,17 @@ const initFilters = () => {
         </DataTable>
 
         <!--EditDialog-->
-        <Dialog v-model:visible="editDialogVisible" :style="{ width: '450px' }" header="修改链接" :modal="true"
+        <Dialog v-model:visible="editDialogVisible" :style="{ width: '450px' }" :header="editDialogHeader" :modal="true"
                 class="p-fluid">
           <div class="field">
             <label for="editLongLink">长链</label>
-            <InputText id="editLongLink" v-model.trim="link.longLink" required="true" :placeholder="link.longLink"
+            <InputText id="editLongLink" v-model.trim="newLink.longLink" required="true" :placeholder="newLink.longLink"
                        autofocus
-                       :class="{ 'p-invalid': submitted && !link.longLink }"/>
+                       :class="{ 'p-invalid': submitted && !newLink.longLink }"/>
           </div>
           <div class="field">
             <label for="editLongLink">备注</label>
-            <InputText id="editComment" v-model.trim="link.comment" required="false" :placeholder="link.comment"
+            <InputText id="editComment" v-model.trim="newLink.comment" required="false" :placeholder="newLink.comment"
                        autofocus/>
           </div>
           <template #footer>
@@ -243,17 +286,37 @@ const initFilters = () => {
           </div>
           <p></p>
           <p class="mb-5">
-
             <DataTable :value="toDeleteLinks" tableStyle="">
               <Column field="shortLink" header="短链"></Column>
+              <Column field="comment" header="备注"></Column>
+            </DataTable>
+          </p>
+          <template #footer>
+            <Button label="取消" icon="pi pi-times" class="p-button-text" @click="cancelDeleteDialog" autofocus/>
+            <Button label="确认" icon="pi pi-check" class="p-button-text" @click="confirmDeleteLink"/>
+          </template>
+        </Dialog>
+
+        <!--AddLinksFromFileDialog-->
+        <Dialog v-model:visible="addLinkFromFileDialogVisible" :style="{ width: '450px'}" header="确认添加"
+                :modal="true">
+          <div class="flex align-items-center justify-content-center">
+            <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem"/>
+            <span v-if="newLinks" style="width: 100%">确认添加以下{{ newLinks.length }}个链接</span>
+          </div>
+          <p></p>
+          <p class="mb-5">
+
+            <DataTable :value="newLinks" tableStyle="">
+              <Column field="longLink" header="长链"></Column>
               <Column field="comment" header="备注"></Column>
             </DataTable>
           </p>
 
 
           <template #footer>
-            <Button label="取消" icon="pi pi-times" class="p-button-text" @click="cancelDeleteDialog" onfocus/>
-            <Button label="确认" icon="pi pi-check" class="p-button-text" @click="confirmDeleteLink"/>
+            <Button label="取消" icon="pi pi-times" class="p-button-text" @click="cancelAddFromFileDialog"/>
+            <Button label="确认" icon="pi pi-check" class="p-button-text" @click="confirmAddFromFileDialog" autofocus/>
           </template>
         </Dialog>
       </div>
@@ -262,4 +325,25 @@ const initFilters = () => {
 </template>
 
 <style scoped lang="scss">
+#fileUpload {
+  position: relative;
+
+  &:hover {
+    &:before {
+      margin: 2px;
+      width: 100%;
+      content: "csv无表头,共两列\a长链,备注"; // 悬浮框里面的内容
+      position: absolute;
+      top: 100%; // 与按钮底部对齐
+      left: 50%; // 横向居中
+      transform: translateX(-50%); // 居中
+      padding: 4px;
+      background-color: #6f6f6f;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 5px;
+      white-space: pre;
+    }
+  }
+}
 </style>
