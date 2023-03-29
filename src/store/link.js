@@ -40,6 +40,7 @@ const actions = {
 
     async fetchLinks(keyword = '', amount = 50) {
         axios.get(`/link/details?keyword=${keyword}&amount=${amount}`).then(response => {
+            this.fetchLinksAmountTotal();
             if (response.status === 200) {
                 this.links = response.data;
                 return true;
@@ -58,7 +59,7 @@ const actions = {
                 return linkData.shortLink;
             })
         };
-        axios.post(`/link/del`, data).then(response => {
+        return axios.post(`/link/del`, data).then(response => {
             if (response.status === 200) {
                 return true;
             } else {
@@ -70,8 +71,8 @@ const actions = {
         });
     },
 
-    async addLink(linkData) {
-        axios.post('/link/add', linkData).then(response => {
+    async addLink(linkDataList) {
+        return axios.post('/link/add', linkDataList).then(response => {
             if (response.status === 200) {
                 return true;
             } else {
@@ -89,7 +90,7 @@ const actions = {
             'longLink': linkData.longLink,
             'comment': linkData.comment
         };
-        axios.post('/link/update', sendData).then(response => {
+        return axios.post('/link/update', sendData).then(response => {
             if (response.status === 200) {
                 return true;
             } else {

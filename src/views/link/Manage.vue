@@ -7,11 +7,17 @@ import {ref, watch} from 'vue';
 import {useToast} from 'primevue/usetoast';
 import {useLinkStore} from '@/store/link';
 import {storeToRefs} from "pinia";
-import {getArrIndexByEle, unixTimeToString} from "@/service/utils";
+import {unixTimeToString} from "@/service/utils";
 
 const linkStore = useLinkStore();
 const toast = useToast(); // 弹窗实例
-const {links} = storeToRefs(linkStore); // DataTable数据
+const {links, amountTotal} = storeToRefs(linkStore); // DataTable数据
+
+const currentPageReportTemplateStr = ref(`显示${amountTotal.value}条的最新{totalRecords}条，当前 {first} 到 {last} `);
+watch(amountTotal, (val) => {
+  currentPageReportTemplateStr.value = `显示${val}条的最新{totalRecords}条，当前 {first} 到 {last} `;
+});
+
 
 //region 编辑/新建Dialog
 const newLink = ref({}); // 暂存单个信息编辑/新增时使用
@@ -45,9 +51,9 @@ const confirmEditDialog = () => {
   if (newLink.value.longLink && newLink.value.longLink.trim() && newLink.value.comment.trim()) {
     // 更新
     if (editDialogSubmitType.value === 'update') {
-      links.value[getArrIndexByEle(newLink.value.shortLink, links.value, 'shortLink')] = newLink.value;
       linkStore.updateLink(newLink.value).then(res => {
         if (res === true) {
+          linkStore.fetchLinks();
           toast.add({severity: 'success', summary: '成功', detail: '链接更新成功', life: 3000});
         } else {
           toast.add({severity: 'error', summary: '失败', detail: '链接更新失败', life: 3000});
@@ -55,7 +61,10 @@ const confirmEditDialog = () => {
       });
     } else {
       // 新增
-      linkStore.addLink(newLink.value).then(res => {
+      linkStore.addLink([{
+        longLink: newLink.value.longLink,
+        comment: newLink.value.comment
+      }]).then(res => {
         if (res === true) {
           linkStore.fetchLinks();
           toast.add({severity: 'success', summary: '成功', detail: '链接创建成功', life: 3000});
@@ -88,7 +97,6 @@ const openDeleteDialog = (linkItem) => {
     toDeleteLinks.value = [linkItem];
     deleteDialogVisible.value = true;
   } else if (selectedLinks.value && selectedLinks.value.length > 0) {
-    console.log(selectedLinks.value);
     toDeleteLinks.value = links.value.filter((val) => selectedLinks.value.includes(val));
     deleteDialogVisible.value = true;
   } else {
@@ -124,6 +132,9 @@ const openAddFromFileDialog = (event) => {
     const lines = reader.result.split(/\r?\n/);
     newLinks.value = [];
     for (let i = 0; i < lines.length; i++) {
+      if (lines[i].trim() === '') {
+        continue;
+      }
       const index = lines[i].indexOf(',');
       if (index !== -1) {
         newLinks.value.push({
@@ -146,7 +157,7 @@ const cancelAddFromFileDialog = () => {
   addLinkFromFileDialogVisible.value = false;
 };
 // 从文件新增Dialog-确认
-const confirmAddFromFileDialog = () => {
+const confirmAddFromFileDialog = async () => {
   addLinkFromFileDialogVisible.value = false;
   linkStore.addLink(newLinks.value).then(res => {
     if (res === true) {
@@ -168,6 +179,7 @@ const search = () => {
   }
   linkStore.fetchLinks(searchKeyword.value, -1);
 };
+//endregion
 
 linkStore.fetchLinks();
 </script>
@@ -201,7 +213,7 @@ linkStore.fetchLinks();
             :paginator="true"
             :rows="10"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-            currentPageReportTemplate="总计 {totalRecords} 个链接的 {first} - {last} "
+            :currentPageReportTemplate="currentPageReportTemplateStr"
             responsiveLayout="scroll"
         >
           <!--表头-->
@@ -210,7 +222,7 @@ linkStore.fetchLinks();
               <h5 class="m-0">管理链接</h5>
               <span class="block mt-2 md:mt-0 p-input-icon-left">
                 <i class="pi pi-search"/>
-                <InputText v-model="searchKeyword" placeholder="搜索..." @keyup.enter="search"/>
+                <InputText v-model="searchKeyword" placeholder="搜索全部链接..." @keyup.enter="search"/>
               </span>
             </div>
           </template>
