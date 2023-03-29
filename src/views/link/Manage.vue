@@ -3,8 +3,7 @@
  * Created by YuYoung on 2023/3/23
  * Description: 短链管理
  */
-import {FilterMatchMode} from 'primevue/api';
-import {onBeforeMount, ref, watch} from 'vue';
+import {ref, watch} from 'vue';
 import {useToast} from 'primevue/usetoast';
 import {useLinkStore} from '@/store/link';
 import {storeToRefs} from "pinia";
@@ -58,7 +57,7 @@ const confirmEditDialog = () => {
       // 新增
       linkStore.addLink(newLink.value).then(res => {
         if (res === true) {
-          linkStore.fetchLinks(50);
+          linkStore.fetchLinks();
           toast.add({severity: 'success', summary: '成功', detail: '链接创建成功', life: 3000});
         } else {
           toast.add({severity: 'error', summary: '失败', detail: '链接创建失败', life: 3000});
@@ -105,7 +104,7 @@ const confirmDeleteLink = () => {
   deleteDialogVisible.value = false;
   linkStore.deleteLink(toDeleteLinks.value).then(res => {
     if (res === true) {
-      linkStore.fetchLinks(50);
+      linkStore.fetchLinks();
       toast.add({severity: 'success', summary: '成功', detail: '链接删除成功', life: 3000});
     } else {
       toast.add({severity: 'error', summary: '失败', detail: '链接删除失败', life: 3000});
@@ -151,7 +150,7 @@ const confirmAddFromFileDialog = () => {
   addLinkFromFileDialogVisible.value = false;
   linkStore.addLink(newLinks.value).then(res => {
     if (res === true) {
-      linkStore.fetchLinks(50);
+      linkStore.fetchLinks();
       toast.add({severity: 'success', summary: '成功', detail: '链接创建成功', life: 3000});
     } else {
       toast.add({severity: 'error', summary: '失败', detail: '链接创建失败', life: 3000});
@@ -160,18 +159,17 @@ const confirmAddFromFileDialog = () => {
 };
 //endregion
 
-const filters = ref({});
-const initFilters = () => {
-  filters.value = {
-    global: {value: null, matchMode: FilterMatchMode.CONTAINS}
-  };
+//region search
+const searchKeyword = ref('');
+const search = () => {
+  if (searchKeyword.value === '') {
+    linkStore.fetchLinks();
+    return;
+  }
+  linkStore.fetchLinks(searchKeyword.value, -1);
 };
 
-onBeforeMount(() => {
-  initFilters();
-});
-
-linkStore.fetchLinks(50);
+linkStore.fetchLinks();
 </script>
 
 <template>
@@ -202,7 +200,6 @@ linkStore.fetchLinks(50);
             dataKey="shortLink"
             :paginator="true"
             :rows="10"
-            :filters="filters"
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="总计 {totalRecords} 个链接的 {first} - {last} "
             responsiveLayout="scroll"
@@ -213,7 +210,7 @@ linkStore.fetchLinks(50);
               <h5 class="m-0">管理链接</h5>
               <span class="block mt-2 md:mt-0 p-input-icon-left">
                 <i class="pi pi-search"/>
-                <InputText v-model="filters['global'].value" placeholder="搜索..."/>
+                <InputText v-model="searchKeyword" placeholder="搜索..." @keyup.enter="search"/>
               </span>
             </div>
           </template>
@@ -332,7 +329,7 @@ linkStore.fetchLinks(50);
     &:before {
       margin: 2px;
       width: 100%;
-      content: "csv无表头,共两列\a长链,备注"; // 悬浮框里面的内容
+      content: "格式: csv无表头,共两列\a长链,备注"; // 悬浮框里面的内容
       position: absolute;
       top: 100%; // 与按钮底部对齐
       left: 50%; // 横向居中

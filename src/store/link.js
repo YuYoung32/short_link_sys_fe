@@ -26,13 +26,26 @@ const getters = {};
 const actions = {
     async fetchLinksAmountTotal() {
         axios.get('/link/amountTotal').then(response => {
-            this.amountTotal = response.data.amountTotal;
+            if(response.status === 200){
+                this.amountTotal = response.data.amountTotal;
+            }else{
+                throw response.data.msg;
+            }
+        }).catch((msg) => {
+            console.error(msg);
         });
     },
 
-    async fetchLinks(amount) {
-        axios.get(`/link/details?amount=${amount}`).then(response => {
-            this.links = response.data;
+    async fetchLinks(keyword = '', amount = 50) {
+        axios.get(`/link/details?keyword=${keyword}&amount=${amount}`).then(response => {
+            if (response.status === 200) {
+                this.links = response.data;
+                return true;
+            } else {
+                throw response.data.msg;
+            }
+        }).catch((msg) => {
+            console.error(msg);
         });
     },
 
@@ -43,7 +56,7 @@ const actions = {
             })
         };
         axios.post(`/link/del`, data).then(response => {
-            if (response.data.code === '200') {
+            if (response.status === 200) {
                 return true;
             } else {
                 throw response.data.msg;
