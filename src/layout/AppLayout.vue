@@ -22,8 +22,6 @@ watch(isSidebarActive, (newVal) => {
 
 const containerClass = computed(() => {
   return {
-    'layout-theme-light': layoutConfig.darkTheme.value === 'light',
-    'layout-theme-dark': layoutConfig.darkTheme.value === 'dark',
     'layout-overlay': layoutConfig.menuMode.value === 'overlay',
     'layout-static': layoutConfig.menuMode.value === 'static',
     'layout-static-inactive': layoutState.staticMenuDesktopInactive.value && layoutConfig.menuMode.value === 'static',
@@ -61,16 +59,22 @@ const isOutsideClicked = (event) => {
 
 <template>
   <div class="layout-wrapper" :class="containerClass">
+    <!--顶部栏-->
     <app-topbar></app-topbar>
+
+    <!--侧边栏-->
     <div class="layout-sidebar">
       <app-sidebar></app-sidebar>
     </div>
+
+    <!--主体, 所有应用显示在此-->
     <div class="layout-main-container">
       <div class="layout-main">
         <router-view></router-view>
       </div>
     </div>
-<!--    <div class="layout-mask"></div>-->
+    <!--小屏幕时点击侧边栏背部阴影-->
+    <div class="layout-mask"></div>
   </div>
 </template>
 

@@ -3,96 +3,47 @@
  * Created by YuYoung on 2023/3/20
  * Description: AppSidebar传入一项数据, 这里进行渲染, 渲染为sidebar里的菜单项
  */
-import {ref, onBeforeMount, watch} from 'vue';
+import {defineProps, toRefs} from 'vue';
 import {useRoute} from 'vue-router';
 import {useLayout} from '@/layout/layout';
 
 const route = useRoute();
 
-const {layoutConfig, layoutState, setActiveMenuItem, onMenuToggle} = useLayout();
+const {layoutState, onMenuToggle} = useLayout();
+const props = defineProps(['item', 'root']);
+const {item, root} = toRefs(props);
 
-// eslint-disable-next-line no-undef
-const props = defineProps({
-  item: {
-    type: Object,
-    default: () => ({})
-  },
-  index: {
-    type: Number,
-    default: 0
-  },
-  root: {
-    type: Boolean,
-    default: true
-  },
-  parentItemKey: {
-    type: String,
-    default: null
-  }
-});
-
-const isActiveMenu = ref(false);
-const itemKey = ref(null);
-
-onBeforeMount(() => {
-  itemKey.value = props.parentItemKey ? props.parentItemKey + '-' + props.index : String(props.index);
-
-  const activeItem = layoutState.activeMenuItem;
-
-  isActiveMenu.value = activeItem === itemKey.value || activeItem ? activeItem.startsWith(itemKey.value + '-') : false;
-});
-
-watch(
-    () => layoutConfig.activeMenuItem.value,
-    (newVal) => {
-      isActiveMenu.value = newVal === itemKey.value || newVal.startsWith(itemKey.value + '-');
-    }
-);
-const itemClick = (event, item) => {
-  if (item.disabled) {
-    event.preventDefault();
-    return;
-  }
-
+const itemClick = () => {
   const {overlayMenuActive, staticMenuMobileActive} = layoutState;
-
-  if ((item.to || item.url) && (staticMenuMobileActive.value || overlayMenuActive.value)) {
+  // 小屏模式下, 点击菜单项进入后, 关闭菜单, 此处确认是要跳转链接, 且是小屏模式下
+  if (staticMenuMobileActive.value || overlayMenuActive.value) {
     onMenuToggle();
   }
-
-  if (item.command) {
-    item.command({originalEvent: event, item: item});
-  }
-
-  const foundItemKey = item.items ? (isActiveMenu.value ? props.parentItemKey : itemKey) : itemKey.value;
-
-  setActiveMenuItem(foundItemKey);
-};
-
-const checkActiveRoute = (item) => {
-  return route.path === item.to;
 };
 </script>
 
 <template>
-  <li :class="{ 'layout-root-menuitem': root, 'active-menuitem': isActiveMenu }">
-    <div v-if="root && item.visible !== false" class="layout-menuitem-root-text">{{ item.label }}</div>
-    <a v-if="(!item.to || item.items) && item.visible !== false" :href="item.url"
-       @click="itemClick($event, item, index)" :class="item.class" :target="item.target" tabindex="0">
+  <li :class="{ 'layout-root-menuitem': root}">
+    <!--label-->
+    <div v-if="root" class="layout-menuitem-root-text">{{ item.label }}</div>
+
+    <!--跳转到其他页面, 非注册在 / 下, 没有to, 通过url跳转, 由于标签不同<a>和<router-link>不同, 必须区分-->
+    <a v-if="!item.to" :href="item.url" @click="itemClick()" :target="item.target">
       <i :class="item.icon" class="layout-menuitem-icon"></i>
       <span class="layout-menuitem-text">{{ item.label }}</span>
-      <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
     </a>
-    <router-link v-if="item.to && !item.items && item.visible !== false" @click="itemClick($event, item, index)"
-                 :class="[item.class, { 'active-route': checkActiveRoute(item) }]" tabindex="0" :to="item.to">
+
+    <!--跳转显示各个路由, 有to-->
+    <!--class用来匹配当前URL和所有侧边栏选项, 若匹配设置颜色-->
+    <router-link v-if="item.to" @click="itemClick()" :class="{ 'active-route': route.path === item.to }" :to="item.to">
       <i :class="item.icon" class="layout-menuitem-icon"></i>
       <span class="layout-menuitem-text">{{ item.label }}</span>
-      <i class="pi pi-fw pi-angle-down layout-submenu-toggler" v-if="item.items"></i>
     </router-link>
-    <Transition v-if="item.items && item.visible !== false" name="layout-submenu">
-      <ul v-show="root ? true : isActiveMenu" class="layout-submenu">
-        <app-menu-item v-for="(child, i) in item.items" :key="child" :index="i" :item="child" :parentItemKey="itemKey"
-                       :root="false"></app-menu-item>
+
+    <!--存在子级, 递归调用-->
+    <Transition v-if="item.items" name="layout-submenu">
+      <ul class="layout-submenu">
+        <app-menu-item v-for="child in item.items" :key="child" :item="child" :root="false"></app-menu-item>
       </ul>
     </Transition>
   </li>

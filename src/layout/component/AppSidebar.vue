@@ -14,8 +14,7 @@ const model = ref([
   {
     label: '短链',
     items: [
-      {label: '短链显示', icon: 'pi pi-fw pi-table', to: '/link/display'},
-      {label: '短链管理', icon: 'pi pi-fw pi-id-card', to: '/link/manage'},
+      {label: '短链管理', icon: 'pi pi-fw pi-id-card', to: '/link/manage'}
     ]
   },
   {
@@ -44,9 +43,8 @@ const model = ref([
 
 <template>
   <ul class="layout-menu">
-    <template v-for="(item, i) in model" :key="item">
-      <app-menu-item v-if="!item.separator" :item="item" :index="i"></app-menu-item>
-      <li v-if="item.separator" class="menu-separator"></li>
+    <template v-for="item in model" :key="item">
+      <app-menu-item :item="item" :root="true"></app-menu-item>
     </template>
   </ul>
 </template>

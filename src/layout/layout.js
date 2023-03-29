@@ -1,14 +1,12 @@
 import {toRefs, reactive, computed} from "vue";
 
-// 配合css确定动画效果、页面显示等
+// 配合css确定主页面的动画效果、页面显示等
 const layoutConfig = reactive({
     ripple: false,                  // 动画
     darkTheme: false,               // 暗黑模式
-    inputStyle: "outlined",         // 输入框样式
-    menuMode: "static",             // 菜单模式
+    inputStyle: "outlined",         // 输入框样式: filled, outlined
+    menuMode: "static",             // 菜单模式: overlay, static
     theme: "lara-light-indigo",     // 主题
-    scale: 14,                      // 缩放
-    activeMenuItem: null            // 当前激活的菜单项
 });
 
 // 当前页面的状态
@@ -23,25 +21,11 @@ const layoutState = reactive({
 
 // 组件使用该函数 得到和改变 配置和状态信息
 export function useLayout() {
-    // 暗黑模式
-    const changeThemeSettings = (theme, darkTheme) => {
-        layoutConfig.darkTheme = darkTheme;
-        layoutConfig.theme = theme;
-    };
 
-    // 设置缩放
-    const setScale = (scale) => {
-        layoutConfig.scale = scale;
-    };
-
-    // 设置当前激活的菜单项
-    const setActiveMenuItem = (item) => {
-        layoutConfig.activeMenuItem = item.value || item;
-    };
-
-    // 自适应菜单
+    // 菜单隐藏与显示
     const onMenuToggle = () => {
         if (layoutConfig.menuMode === "overlay") {
+            // 菜单模式为overlay时，点击菜单按钮，菜单禁止显示
             layoutState.overlayMenuActive = !layoutState.overlayMenuActive;
         }
 
@@ -54,16 +38,10 @@ export function useLayout() {
 
     const isSidebarActive = computed(() => layoutState.overlayMenuActive || layoutState.staticMenuMobileActive);
 
-    const isDarkTheme = computed(() => layoutConfig.darkTheme);
-
     return {
         layoutConfig: toRefs(layoutConfig),
         layoutState: toRefs(layoutState),
-        changeThemeSettings,
-        setScale,
         onMenuToggle,
         isSidebarActive,
-        isDarkTheme,
-        setActiveMenuItem
     };
 }

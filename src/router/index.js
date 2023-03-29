@@ -14,11 +14,6 @@ const routes = [
                 component: () => import('@/views/Dashboard.vue')
             },
             {
-                path: '/link/display',
-                name: 'linkDisplay',
-                component: () => import('@/views/link/Display.vue')
-            },
-            {
                 path: '/link/manage',
                 name: 'linkManage',
                 component: () => import('@/views/link/Manage.vue')
