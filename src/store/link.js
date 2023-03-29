@@ -26,13 +26,15 @@ const getters = {};
 const actions = {
     async fetchLinksAmountTotal() {
         axios.get('/link/amountTotal').then(response => {
-            if(response.status === 200){
+            if (response.status === 200) {
                 this.amountTotal = response.data.amountTotal;
-            }else{
+                return true;
+            } else {
                 throw response.data.msg;
             }
         }).catch((msg) => {
             console.error(msg);
+            return msg;
         });
     },
 
@@ -46,6 +48,7 @@ const actions = {
             }
         }).catch((msg) => {
             console.error(msg);
+            return msg;
         });
     },
 
@@ -69,12 +72,13 @@ const actions = {
 
     async addLink(linkData) {
         axios.post('/link/add', linkData).then(response => {
-            if (response.data.code === '200') {
+            if (response.status === 200) {
                 return true;
             } else {
                 throw response.data.msg;
             }
         }).catch((msg) => {
+            console.error(msg);
             return msg;
         });
     },
@@ -86,12 +90,13 @@ const actions = {
             'comment': linkData.comment
         };
         axios.post('/link/update', sendData).then(response => {
-            if (response.data.code === '200') {
+            if (response.status === 200) {
                 return true;
             } else {
                 throw response.data.msg;
             }
         }).catch((msg) => {
+            console.error(msg);
             return msg;
         });
     }

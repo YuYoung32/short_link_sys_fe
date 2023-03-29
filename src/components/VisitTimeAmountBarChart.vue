@@ -4,7 +4,7 @@
  * Description: 时间访问量柱状图
  */
 
-import {reactive, defineProps, watchEffect} from "vue";
+import {ref, reactive, defineProps, watchEffect} from "vue";
 import {useVisitStore} from "@/store/visit";
 import {storeToRefs} from "pinia";
 
@@ -13,7 +13,7 @@ const visitStore = useVisitStore();
 const {visitAmountLastBetween} = storeToRefs(visitStore);
 
 const props = defineProps(['title', 'begin', 'end']);
-const titleRef = reactive(props.title);
+const titleRef = ref(props.title);
 
 const xData = reactive([]);
 

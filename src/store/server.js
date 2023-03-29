@@ -52,11 +52,18 @@ const getters = {
 
 const actions = {
     async fetchServerStaticInfo() {
-        axios.get('/server/staticInfo')
-            .then(response => {
+        axios.get('/server/staticInfo').then(response => {
+            if (response.status === 200) {
                 this.memTotalSize = response.data.memTotalSize;
                 this.diskTotalSize = response.data.diskTotalSize;
-            });
+                return true;
+            } else {
+                throw response.data.msg;
+            }
+        }).catch((msg) => {
+            console.error(msg);
+            return msg;
+        });
     },
 
     async fetchRealtimeServerInfo() {
@@ -119,30 +126,42 @@ const actions = {
     async fetchInfoLastXHour(x) {
         axios.get(`/server/InfoXhr?x=${x}`)
             .then(response => {
-                this.cpuUsageRatioLastXHour = response.data.cpuUsageRatioLastXHour;
-                this.memUsageRatioLastXHour = response.data.memUsageRatioLastXHour;
-                this.diskUsageRatioLastXHour = response.data.diskUsageRatioLastXHour;
-                this.ttlLastXHour = response.data.ttlLastXHour;
-                this.xHourTimePoints = response.data.xHourTimePoints;
-                if (x === 48) {
-                    this.cpuUsageRatioLast48Hours = response.data.cpuUsageRatioLastXHour;
-                    this.memUsageRatioLast48Hours = response.data.memUsageRatioLastXHour;
-                    this.diskUsageRatioLast48Hours = response.data.diskUsageRatioLastXHour;
-                    this.ttlLast48Hours = response.data.ttlLastXHour;
+                if (response.status === 200) {
+                    this.cpuUsageRatioLastXHour = response.data.cpuUsageRatioLastXHour;
+                    this.memUsageRatioLastXHour = response.data.memUsageRatioLastXHour;
+                    this.diskUsageRatioLastXHour = response.data.diskUsageRatioLastXHour;
+                    this.ttlLastXHour = response.data.ttlLastXHour;
+                    this.xHourTimePoints = response.data.xHourTimePoints;
+                    if (x === 48) {
+                        this.cpuUsageRatioLast48Hours = response.data.cpuUsageRatioLastXHour;
+                        this.memUsageRatioLast48Hours = response.data.memUsageRatioLastXHour;
+                        this.diskUsageRatioLast48Hours = response.data.diskUsageRatioLastXHour;
+                        this.ttlLast48Hours = response.data.ttlLastXHour;
+                    }
+                    return true;
+                } else {
+                    throw response.data.msg;
                 }
-            });
+            }).catch((msg) => {
+            console.error(msg);
+            return msg;
+        });
     },
 
     async fetchInfoLast1Min() {
-        try {
-            const response = await axios.get('/server/info1Min');
-            this.cpuUsageRatioLastMin = response.data.cpuUsageRatioLastMin;
-            this.memUsageRatioLastMin = response.data.memUsageRatioLastMin;
-            this.diskUsageRatioLastMin = response.data.diskUsageRatioLastMin;
-        } catch (e) {
-            console.error(e);
-        }
-
+        axios.get('/server/info1Min').then(response => {
+            if (response.status === 200) {
+                this.cpuUsageRatioLastMin = response.data.cpuUsageRatioLastMin;
+                this.memUsageRatioLastMin = response.data.memUsageRatioLastMin;
+                this.diskUsageRatioLastMin = response.data.diskUsageRatioLastMin;
+                return true;
+            } else {
+                throw response.data.msg;
+            }
+        }).catch((msg) => {
+            console.error(msg);
+            return msg;
+        });
     }
 };
 

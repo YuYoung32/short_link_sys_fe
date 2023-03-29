@@ -31,27 +31,48 @@ const getters = {
 
 const actions = {
     async fetchVisitAmountLastBetween(begin, end) {
-        try {
-            const response = await axios.get(`/visit/amount?begin=${begin}&end=${end}`);
-            this.visitAmountLastBetween = response.data.amount;
-            return response.data.amount;
-        } catch (e) {
-            console.error(e);
-        }
+
+        axios.get(`/visit/amount?begin=${begin}&end=${end}`).then(response => {
+            if (response.status === 200) {
+                this.visitAmountLastBetween = response.data.amount;
+                return true;
+            } else {
+                throw response.data.msg;
+            }
+        }).catch(msg => {
+            console.error(msg);
+            return msg;
+        });
     },
 
     async fetchVisitIpXhr(x) {
         axios.get(`/visit/ipXhr?x=${x}`)
             .then(response => {
-                this.visitIPLastXHour = response.data.visitIPLastXHour;
-            });
+                if (response.status === 200) {
+                    this.visitIPLastBetween = response.data.visitIPLastBetween;
+                    return true;
+                } else {
+                    throw response.data.msg;
+                }
+            }).catch(msg => {
+            console.error(msg);
+            return msg;
+        });
     },
 
     async fetchVisitDetails(amount) {
         axios.get(`/visit/details?amount=${amount}`)
             .then(response => {
-                this.visitDetails = response.data.visitDetails;
-            });
+                if (response.status === 200) {
+                    this.visitDetails = response.data.visitDetails;
+                    return true;
+                } else {
+                    throw response.data.msg;
+                }
+            }).catch(msg => {
+            console.error(msg);
+            return msg;
+        });
     }
 };
 
