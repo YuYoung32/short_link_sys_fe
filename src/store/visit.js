@@ -8,7 +8,11 @@ import axios from '@/service/net';
 
 const state = () => {
     return {
+        // 过去一段时间的访问时段列表
         visitAmountLastBetween: [],
+
+        // 总访问量
+        visitAmountTotal: '-',
 
         /**
          * visitIPLast7D每一项结构
@@ -17,6 +21,7 @@ const state = () => {
             amount: Number,
          }
          */
+        // 过去一段时间的访问IP-数量 列表
         visitIPLastBetween: [],
 
         visitDetails: []
@@ -47,6 +52,23 @@ const actions = {
             });
     },
 
+    async fetchVisitAmountTotal(begin = '', end = '') {
+        axios
+            .get(`/visit/amountTotal?begin=${begin}&end=${end}`)
+            .then((response) => {
+                if (response.status === 200) {
+                    this.visitAmountTotal = response.data.amount;
+                    return true;
+                } else {
+                    throw response.data.msg;
+                }
+            })
+            .catch((msg) => {
+                console.error(msg);
+                return msg;
+            });
+    },
+
     async fetchVisitIpXhr(x) {
         axios
             .get(`/visit/ipXhr?x=${x}`)
@@ -64,9 +86,9 @@ const actions = {
             });
     },
 
-    async fetchVisitDetails(amount) {
-        axios
-            .get(`/visit/details?amount=${amount}`)
+    async fetchVisitDetails(options = {}) {
+        return axios
+            .post('/visit/details', options)
             .then((response) => {
                 if (response.status === 200) {
                     this.visitDetails = response.data.visitDetails;
