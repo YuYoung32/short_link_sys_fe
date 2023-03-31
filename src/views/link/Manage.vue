@@ -13,7 +13,7 @@ const linkStore = useLinkStore();
 const toast = useToast(); // 弹窗实例
 const {links, amountTotal} = storeToRefs(linkStore); // DataTable数据
 
-const currentPageReportTemplateStr = ref(`显示${amountTotal.value}条的最新{totalRecords}条，当前 {first} 到 {last} `);
+const currentPageReportTemplateStr = ref(`总计${amountTotal.value}条的最新{totalRecords}条，当前 {first} 到 {last} `);
 watch(amountTotal, (val) => {
   currentPageReportTemplateStr.value = `显示${val}条的最新{totalRecords}条，当前 {first} 到 {last} `;
 });
@@ -208,11 +208,10 @@ linkStore.fetchLinks();
         <!--表格-->
         <DataTable
             :value="links"
-            v-model:selection="selectedLinks"
-            dataKey="shortLink"
-            :paginator="true"
-            :rows="10"
-            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            v-model:selection="selectedLinks" dataKey="shortLink"
+            resizableColumns columnResizeMode="fit"
+            :paginator="true" :rows="10" :rowsPerPageOptions="[10, 20, 50]" paginatorPosition="top"
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
             :currentPageReportTemplate="currentPageReportTemplateStr"
             responsiveLayout="scroll"
         >
@@ -226,35 +225,32 @@ linkStore.fetchLinks();
               </span>
             </div>
           </template>
-
+          <template #empty> 无记录</template>
           <!--选择列-->
           <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
           <!--数据列-->
-          <Column field="shortLink" header="短链" headerStyle="width:14%; min-width:5rem;">
+          <Column field="shortLink" header="短链" headerStyle="width:14%; min-width:5rem;" >
             <template #body="slotProps">
-              <span class="p-column-title">短链</span>
               {{ slotProps.data.shortLink }}
             </template>
           </Column>
           <Column field="longLink" header="长链" headerStyle="width:14%; min-width:4rem;">
             <template #body="slotProps">
-              <span class="p-column-title">长链</span>
               {{ slotProps.data.longLink }}
             </template>
           </Column>
           <Column field="comment" header="备注" headerStyle="width:14%; min-width:4rem;">
             <template #body="slotProps">
-              <span class="p-column-title">备注</span>
               {{ slotProps.data.comment }}
             </template>
           </Column>
           <Column field="createTime" header="创建时间" headerStyle="width:14%; min-width:8rem;">
             <template #body="slotProps">
-              <span class="p-column-title">备注</span>
               {{ unixTimeToString(slotProps.data.createTime) }}
             </template>
           </Column>
+
           <!--操作列-->
           <Column headerStyle="min-width:10rem;">
             <template #body="slotProps">
