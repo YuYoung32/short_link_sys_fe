@@ -8,26 +8,25 @@
  * @prop.custom(可选) 是否自定义内容, true为自定义内容, 在slot中自定义内容
  */
 
-import {defineProps} from 'vue';
+import { defineProps } from 'vue';
 
 const props = defineProps(['title', 'msg', 'custom']);
-
 </script>
 
 <template>
-  <div class="col-12 lg:col-6 xl:col-3">
-    <div class="card mb-0">
-      <div class="flex justify-content-between mb-3 h-4rem">
-        <div>
-          <span class="block text-700 font-medium mb-3">{{ props.title }}</span>
-          <span v-if="!(props.custom==='true')">
-              <span class="text-900 font-semibold text-xl">{{ props.msg }}</span>
-          </span>
-          <span v-if="props.custom==='true'">
-            <slot></slot>
-          </span>
+    <div class="col-12 lg:col-6 xl:col-3">
+        <div class="card mb-0">
+            <div class="flex justify-content-between mb-3 h-4rem">
+                <div>
+                    <span class="block text-700 font-medium mb-3">{{ props.title }}</span>
+                    <span v-if="!(props.custom === 'true')">
+                        <span class="text-900 font-semibold text-xl">{{ props.msg }}</span>
+                    </span>
+                    <span v-if="props.custom === 'true'">
+                        <slot></slot>
+                    </span>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
 </template>

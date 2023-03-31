@@ -69,5 +69,4 @@ function unixTimeToString(unixTime) {
     return `${year}-${month}-${day} ${hours}:${minutes}`;
 }
 
-
-export {dateObjToString, pushAndPop, getTodayDayValue, getArrIndexByEle, unixTimeToString};
+export { dateObjToString, pushAndPop, getTodayDayValue, getArrIndexByEle, unixTimeToString };

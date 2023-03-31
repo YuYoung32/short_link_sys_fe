@@ -3,10 +3,9 @@
  * Description: 服务器监控信息
  */
 
-import axios from "@/service/net";
-import {defineStore} from "pinia";
-import {pushAndPop} from "@/service/utils";
-
+import axios from '@/service/net';
+import { defineStore } from 'pinia';
+import { pushAndPop } from '@/service/utils';
 
 const state = () => {
     return {
@@ -34,7 +33,7 @@ const state = () => {
 
         ttlLast48Hours: [],
 
-        wsInvokeTimes: 0,
+        wsInvokeTimes: 0
     };
 };
 
@@ -52,18 +51,21 @@ const getters = {
 
 const actions = {
     async fetchServerStaticInfo() {
-        axios.get('/server/staticInfo').then(response => {
-            if (response.status === 200) {
-                this.memTotalSize = response.data.memTotalSize;
-                this.diskTotalSize = response.data.diskTotalSize;
-                return true;
-            } else {
-                throw response.data.msg;
-            }
-        }).catch((msg) => {
-            console.error(msg);
-            return msg;
-        });
+        axios
+            .get('/server/staticInfo')
+            .then((response) => {
+                if (response.status === 200) {
+                    this.memTotalSize = response.data.memTotalSize;
+                    this.diskTotalSize = response.data.diskTotalSize;
+                    return true;
+                } else {
+                    throw response.data.msg;
+                }
+            })
+            .catch((msg) => {
+                console.error(msg);
+                return msg;
+            });
     },
 
     async fetchRealtimeServerInfo() {
@@ -124,8 +126,9 @@ const actions = {
     },
 
     async fetchInfoLastXHour(x) {
-        axios.get(`/server/InfoXhr?x=${x}`)
-            .then(response => {
+        axios
+            .get(`/server/InfoXhr?x=${x}`)
+            .then((response) => {
                 if (response.status === 200) {
                     this.cpuUsageRatioLastXHour = response.data.cpuUsageRatioLastXHour;
                     this.memUsageRatioLastXHour = response.data.memUsageRatioLastXHour;
@@ -142,26 +145,30 @@ const actions = {
                 } else {
                     throw response.data.msg;
                 }
-            }).catch((msg) => {
-            console.error(msg);
-            return msg;
-        });
+            })
+            .catch((msg) => {
+                console.error(msg);
+                return msg;
+            });
     },
 
     async fetchInfoLast1Min() {
-        axios.get('/server/info1Min').then(response => {
-            if (response.status === 200) {
-                this.cpuUsageRatioLastMin = response.data.cpuUsageRatioLastMin;
-                this.memUsageRatioLastMin = response.data.memUsageRatioLastMin;
-                this.diskUsageRatioLastMin = response.data.diskUsageRatioLastMin;
-                return true;
-            } else {
-                throw response.data.msg;
-            }
-        }).catch((msg) => {
-            console.error(msg);
-            return msg;
-        });
+        axios
+            .get('/server/info1Min')
+            .then((response) => {
+                if (response.status === 200) {
+                    this.cpuUsageRatioLastMin = response.data.cpuUsageRatioLastMin;
+                    this.memUsageRatioLastMin = response.data.memUsageRatioLastMin;
+                    this.diskUsageRatioLastMin = response.data.diskUsageRatioLastMin;
+                    return true;
+                } else {
+                    throw response.data.msg;
+                }
+            })
+            .catch((msg) => {
+                console.error(msg);
+                return msg;
+            });
     }
 };
 
