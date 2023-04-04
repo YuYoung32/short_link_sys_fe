@@ -9,21 +9,20 @@ import { storeToRefs } from 'pinia';
 import { dateObjToString } from '@/service/utils';
 import { useToast } from 'primevue/usetoast';
 const visitStore = useVisitStore();
-const { visitAmountTotal, visitDetails } = storeToRefs(visitStore);
+const { visitDetailsAmount, visitDetails } = storeToRefs(visitStore);
 
 // 弹窗实例
 const toast = useToast();
 
 // 数据预获取
-visitStore.fetchVisitAmountTotal();
 visitStore.fetchVisitDetails();
 
-// 编程式生成数据列, 添加/删除列仅修改此即可
+// 编程式生成数据列, 添加/删除列仅修改此即可, 数据特殊处理的列单独处理
 const columns = [
     { field: 'shortLink', header: '短链', sortable: true },
     { field: 'longLink', header: '长链', sortable: true },
     { field: 'comment', header: '链接备注', sortable: true },
-    { field: 'IP', header: 'IP', sortable: true },
+    { field: 'ip', header: 'IP', sortable: true },
     { field: 'region', header: '区域', sortable: true },
     { field: 'visitTime', header: '访问时间', sortable: true }
 ];
@@ -31,9 +30,10 @@ const selectedItemsLabelStr = computed(() => {
     return `{0}/${columns.length}列已显示`;
 });
 
-// 表格分页显示
-const currentPageReportTemplateStr = computed(() => {
-    return `显示${visitAmountTotal.value}条的最新{totalRecords}条，当前 {first} 到 {last} `;
+// 表格Summary
+const currentPageReportTemplateStr = ref('');
+watch(visitDetailsAmount, (newVal) => {
+    currentPageReportTemplateStr.value = `显示${newVal}条的最新{totalRecords}条，当前 {first} - {last} `;
 });
 
 // region 控制表格列的显示/隐藏
@@ -122,17 +122,13 @@ function confirmAllFilter() {
         shortLink: shortLinkKeywords.value,
         longLink: longLinkKeywords.value,
         comment: commentKeywords.value,
-        IP: IPKeywords.value,
+        ip: IPKeywords.value,
         region: regionKeywords.value,
-        rangeTime: () => {
-            if (rangeTimeKeywords.value && rangeTimeKeywords.value.length === 2) {
-                return [dateObjToString(rangeTimeKeywords.value[0]), dateObjToString(rangeTimeKeywords.value[1])];
-            } else {
-                return [];
-            }
-        }
+        rangeTime: []
     };
-
+    if (rangeTimeKeywords.value && rangeTimeKeywords.value.length === 2) {
+        options.rangeTime = [dateObjToString(rangeTimeKeywords.value[0]), dateObjToString(rangeTimeKeywords.value[1])];
+    }
     visitStore.fetchVisitDetails(options).then((res) => {
         if (res === true) {
             toast.add({ severity: 'success', summary: '成功', detail: '筛选成功', life: 3000 });
@@ -176,20 +172,23 @@ function removeAllSort() {
         <div class="col-12">
             <div class="card">
                 <Toast />
+                <!-- 筛选表单 -->
                 <Fieldset v-if="showFieldSet" legend="筛选" :toggleable="true" :collapsed="true">
                     <div class="p-fluid lg:mr-8 lg:ml-8" style="max-width: 100%">
-                        <p>每项按回车确定，均可多选，留空为取消该条件，以下筛选条件均为“与”的关系。</p>
+                        <p>
+                            每项按回车确定，均可多选。留空为不包含该条件，以下筛选类型均为“与”的关系，同个筛选类型的不同条件为”或“的关系。
+                        </p>
                         <h5>短链</h5>
                         <span style="padding: 0">
-                            <Chips type="text" v-model="shortLinkKeywords" placeholder="短链..." />
+                            <Chips type="text" v-model="shortLinkKeywords" placeholder="短链包含字符..." />
                         </span>
                         <h5>长链</h5>
                         <span style="padding: 0">
-                            <Chips type="text" v-model="longLinkKeywords" placeholder="长链..." />
+                            <Chips type="text" v-model="longLinkKeywords" placeholder="长链包含字符..." />
                         </span>
                         <h5>备注</h5>
                         <span style="padding: 0">
-                            <Chips type="text" v-model="commentKeywords" placeholder="备注..." />
+                            <Chips type="text" v-model="commentKeywords" placeholder="备注包含字符..." />
                         </span>
                         <h5>IP</h5>
                         <span style="padding: 0">
@@ -222,11 +221,19 @@ function removeAllSort() {
                             <Calendar
                                 v-model="rangeTimeKeywords"
                                 showIcon
-                                placeholder="时间段..."
+                                placeholder="时间段...选择两个日期"
                                 selection-mode="range"
                                 date-format="yymmdd"
+                                showOtherMonths
+                                selectOtherMonths
                                 :max-date="new Date(new Date().getTime() - 24 * 60 * 60 * 1000)"
-                            />
+                            >
+                                <template #footer>
+                                    <div class="py-2 px-3">
+                                        <Button label="清除" severity="danger" @click="rangeTimeKeywords = []"></Button>
+                                    </div>
+                                </template>
+                            </Calendar>
                         </span>
                         <p />
                         <Button
@@ -290,7 +297,7 @@ function removeAllSort() {
                     <!--数据列-->
                     <template v-for="column in columns" :key="column.shortLink">
                         <Column
-                            v-if="showMap[column.header]"
+                            :hidden="!showMap[column.header]"
                             :field="column.field"
                             :header="column.header"
                             :sortable="column.sortable"
