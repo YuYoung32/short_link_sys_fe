@@ -6,7 +6,7 @@
 import { reactive, ref, watch, nextTick, computed } from 'vue';
 import { useVisitStore } from '@/store/visit';
 import { storeToRefs } from 'pinia';
-import { dateObjToString } from '@/service/utils';
+import { dateObjToDayBeginUnixTime, dateObjToDayEndUnixTime } from '@/service/utils';
 import { useToast } from 'primevue/usetoast';
 const visitStore = useVisitStore();
 const { visitDetailsAmount, visitDetails } = storeToRefs(visitStore);
@@ -127,7 +127,10 @@ function confirmAllFilter() {
         rangeTime: []
     };
     if (rangeTimeKeywords.value && rangeTimeKeywords.value.length === 2) {
-        options.rangeTime = [dateObjToString(rangeTimeKeywords.value[0]), dateObjToString(rangeTimeKeywords.value[1])];
+        options.rangeTime = [
+            dateObjToDayBeginUnixTime(rangeTimeKeywords.value[0]),
+            dateObjToDayEndUnixTime(rangeTimeKeywords.value[1])
+        ];
     }
     visitStore.fetchVisitDetails(options).then((res) => {
         if (res === true) {

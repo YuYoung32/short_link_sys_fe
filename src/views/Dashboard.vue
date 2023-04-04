@@ -11,7 +11,7 @@ import { useVisitStore } from '@/store/visit';
 import DataShowCard from '@/components/DataShowCard';
 import Cpu1MinLineChart from '@/components/Cpu1MinLineChart';
 import VisitTimeAmountBarChart from '@/components/VisitTimeAmountBarChart';
-import { dateObjToString } from '@/service/utils';
+import { dateObjToDayBeginUnixTime, dateObjToDayEndUnixTime } from '@/service/utils';
 
 const serverStore = useServerStore();
 const linkStore = useLinkStore();
@@ -42,8 +42,8 @@ linkStore.fetchLinksAmountTotal();
         <cpu1-min-line-chart />
         <visit-time-amount-bar-chart
             title="7天访问量"
-            :begin="dateObjToString(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000))"
-            :end="dateObjToString(new Date(new Date().getTime() - 24 * 60 * 60 * 1000))"
+            :begin="dateObjToDayBeginUnixTime(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000))"
+            :end="dateObjToDayEndUnixTime(new Date(new Date().getTime() - 24 * 60 * 60 * 1000))"
         />
     </div>
 </template>

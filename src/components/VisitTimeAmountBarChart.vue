@@ -4,7 +4,7 @@
  * Description: 时间访问量柱状图
  */
 
-import { ref, reactive, defineProps, watchEffect } from 'vue';
+import { ref, reactive, defineProps, watch } from 'vue';
 import { useVisitStore } from '@/store/visit';
 import { storeToRefs } from 'pinia';
 
@@ -15,24 +15,28 @@ const { visitAmountLastBetween } = storeToRefs(visitStore);
 const props = defineProps(['title', 'begin', 'end']);
 const titleRef = ref(props.title);
 
-const xData = reactive([]);
-watchEffect(async () => {
-    await visitStore.fetchVisitAmountLastBetween(props.begin, props.end);
-    xData.splice(0, xData.length);
+const xData = ref([]);
+watch(
+    () => props,
+    async (props) => {
+        await visitStore.fetchVisitAmountLastBetween(props.begin, props.end);
+        xData.value = [];
 
-    const startDate = props.begin;
-    const endDate = props.end;
-    const start = new Date(startDate.substring(0, 4), parseInt(startDate.substring(4, 6)) - 1, startDate.substring(6));
-    const end = new Date(endDate.substring(0, 4), parseInt(endDate.substring(4, 6)) - 1, endDate.substring(6));
+        const startDate = new Date();
+        startDate.setTime(1000 * props.begin);
+        const endDate = new Date();
+        endDate.setTime(1000 * props.end);
 
-    // 循环遍历两个日期之间的每一天，并将其添加到数组中
-    for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
-        const year = d.getFullYear();
-        const month = (d.getMonth() + 1).toString().padStart(2, '0');
-        const day = d.getDate().toString().padStart(2, '0');
-        xData.push(`${year}${month}${day}`);
-    }
-});
+        // 循环遍历两个日期之间的每一天，并将其添加到数组中
+        for (let d = startDate; d <= endDate; d.setDate(d.getDate() + 1)) {
+            const year = d.getFullYear();
+            const month = (d.getMonth() + 1).toString().padStart(2, '0');
+            const day = d.getDate().toString().padStart(2, '0');
+            xData.value.push(`${year}${month}${day}`);
+        }
+    },
+    { immediate: true, deep: true }
+);
 
 const data = reactive({
     labels: xData,
