@@ -31,10 +31,14 @@ const selectedItemsLabelStr = computed(() => {
 });
 
 // 表格Summary
-const currentPageReportTemplateStr = ref(`显示-条的最新{totalRecords}条，当前 {first} - {last}`);
-watch(visitDetailsAmount, (newVal) => {
-    currentPageReportTemplateStr.value = `显示${newVal}条的最新{totalRecords}条，当前 {first} - {last}`;
-});
+const currentPageReportTemplateStr = ref('');
+watch(
+    visitDetailsAmount,
+    (newVal) => {
+        currentPageReportTemplateStr.value = `显示${newVal}条的最新{totalRecords}条，当前 {first} - {last}`;
+    },
+    { immediate: true }
+);
 
 // region 控制表格列的显示/隐藏
 // 中文列名, 供选择显示列使用
@@ -275,7 +279,7 @@ function removeAllSort() {
                     <!--表头-->
                     <template #header>
                         <div class="flex flex-column md:flex-row md:justify-content-between md:align-items-center">
-                            <div style="text-align: left">
+                            <div class="md:text-left sm:text-left">
                                 <MultiSelect
                                     v-model="selectedColumns"
                                     :options="selectColumns"
@@ -285,7 +289,10 @@ function removeAllSort() {
                                     placeholder="选择列"
                                 />
                             </div>
-                            <div style="text-align: right">
+                            <div class="md:text-center font-normal sm:text-left my-2">
+                                已筛选{{ visitDetailsAmount }}条数据
+                            </div>
+                            <div class="md:text-right sm:text-left">
                                 <Button
                                     label="清除排序"
                                     icon="pi pi-sort-alt-slash"

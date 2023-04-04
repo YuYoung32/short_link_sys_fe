@@ -37,7 +37,7 @@ const state = () => {
          */
         _visitDetails: [],
         // 因为最多返回1000条, 所以总数需要单独获取
-        visitDetailsAmount: []
+        visitDetailsAmount: '-'
     };
 };
 
