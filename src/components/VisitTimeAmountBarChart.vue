@@ -16,12 +16,21 @@ const props = defineProps(['title', 'begin', 'end']);
 const titleRef = ref(props.title);
 
 const xData = reactive([]);
-
 watchEffect(async () => {
     await visitStore.fetchVisitAmountLastBetween(props.begin, props.end);
     xData.splice(0, xData.length);
-    for (let i = props.begin; i <= props.end; i++) {
-        xData.push(i);
+
+    const startDate = props.begin;
+    const endDate = props.end;
+    const start = new Date(startDate.substring(0, 4), parseInt(startDate.substring(4, 6)) - 1, startDate.substring(6));
+    const end = new Date(endDate.substring(0, 4), parseInt(endDate.substring(4, 6)) - 1, endDate.substring(6));
+
+    // 循环遍历两个日期之间的每一天，并将其添加到数组中
+    for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
+        const year = d.getFullYear();
+        const month = (d.getMonth() + 1).toString().padStart(2, '0');
+        const day = d.getDate().toString().padStart(2, '0');
+        xData.push(`${year}${month}${day}`);
     }
 });
 
