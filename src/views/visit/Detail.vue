@@ -31,9 +31,9 @@ const selectedItemsLabelStr = computed(() => {
 });
 
 // 表格Summary
-const currentPageReportTemplateStr = ref('');
+const currentPageReportTemplateStr = ref(`显示-条的最新{totalRecords}条，当前 {first} - {last}`);
 watch(visitDetailsAmount, (newVal) => {
-    currentPageReportTemplateStr.value = `显示${newVal}条的最新{totalRecords}条，当前 {first} - {last} `;
+    currentPageReportTemplateStr.value = `显示${newVal}条的最新{totalRecords}条，当前 {first} - {last}`;
 });
 
 // region 控制表格列的显示/隐藏
@@ -263,7 +263,7 @@ function removeAllSort() {
                     :paginator="true"
                     :rows="10"
                     :rowsPerPageOptions="[10, 20, 50, 100]"
-                    paginator-position="top"
+                    paginator-position="bottom"
                     sortMode="multiple"
                     removableSort
                     resizableColumns

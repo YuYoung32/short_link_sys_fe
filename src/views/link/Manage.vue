@@ -195,12 +195,31 @@ linkStore.fetchLinks();
                 <Toolbar class="mb-4">
                     <template v-slot:start>
                         <div class="my-2">
-                            <Button label="新增" icon="pi pi-plus" class="p-button-success mr-2" @click="openEditDialog()" />
-                            <Button label="删除" icon="pi pi-trash" class="p-button-danger" @click="openDeleteDialog()" :style="deleteSelectButtonStyle" />
+                            <Button
+                                label="新增"
+                                icon="pi pi-plus"
+                                class="p-button-success mr-2"
+                                @click="openEditDialog()"
+                            />
+                            <Button
+                                label="删除"
+                                icon="pi pi-trash"
+                                class="p-button-danger"
+                                @click="openDeleteDialog()"
+                                :style="deleteSelectButtonStyle"
+                            />
                         </div>
                     </template>
                     <template v-slot:end>
-                        <FileUpload id="fileUpload" mode="basic" :auto="true" :maxFileSize="1000000" chooseLabel="从文件新增" customUpload @uploader="openAddFromFileDialog($event)" />
+                        <FileUpload
+                            id="fileUpload"
+                            mode="basic"
+                            :auto="true"
+                            :maxFileSize="1000000"
+                            chooseLabel="从文件新增"
+                            customUpload
+                            @uploader="openAddFromFileDialog($event)"
+                        />
                     </template>
                 </Toolbar>
 
@@ -214,7 +233,7 @@ linkStore.fetchLinks();
                     :paginator="true"
                     :rows="10"
                     :rowsPerPageOptions="[10, 20, 50]"
-                    paginatorPosition="top"
+                    paginatorPosition="bottom"
                     paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport"
                     :currentPageReportTemplate="currentPageReportTemplateStr"
                     responsiveLayout="scroll"
@@ -225,11 +244,15 @@ linkStore.fetchLinks();
                             <h5 class="m-0">管理链接</h5>
                             <span class="block mt-2 md:mt-0 p-input-icon-left">
                                 <i class="pi pi-search" />
-                                <InputText v-model="searchKeyword" placeholder="搜索全部链接..." @keyup.enter="search" />
+                                <InputText
+                                    v-model="searchKeyword"
+                                    placeholder="搜索全部链接..."
+                                    @keyup.enter="search"
+                                />
                             </span>
                         </div>
                     </template>
-                    <template #empty> 无记录</template>
+                    <template #empty>无数据</template>
                     <!--选择列-->
                     <Column selectionMode="multiple" headerStyle="width: 3rem"></Column>
 
@@ -258,21 +281,48 @@ linkStore.fetchLinks();
                     <!--操作列-->
                     <Column headerStyle="min-width:10rem;">
                         <template #body="slotProps">
-                            <Button icon="pi pi-pencil" class="p-button-rounded p-button-success mr-2" @click="openEditDialog(slotProps.data)" />
-                            <Button icon="pi pi-trash" class="p-button-rounded p-button-danger mt-2" @click="openDeleteDialog(slotProps.data)" />
+                            <Button
+                                icon="pi pi-pencil"
+                                class="p-button-rounded p-button-success mr-2"
+                                @click="openEditDialog(slotProps.data)"
+                            />
+                            <Button
+                                icon="pi pi-trash"
+                                class="p-button-rounded p-button-danger mt-2"
+                                @click="openDeleteDialog(slotProps.data)"
+                            />
                         </template>
                     </Column>
                 </DataTable>
 
                 <!--EditDialog-->
-                <Dialog v-model:visible="editDialogVisible" :style="{ width: '450px' }" :header="editDialogHeader" :modal="true" class="p-fluid">
+                <Dialog
+                    v-model:visible="editDialogVisible"
+                    :style="{ width: '450px' }"
+                    :header="editDialogHeader"
+                    :modal="true"
+                    class="p-fluid"
+                >
                     <div class="field">
                         <label for="editLongLink">长链</label>
-                        <InputText id="editLongLink" v-model.trim="newLink.longLink" required="true" :placeholder="newLink.longLink" autofocus :class="{ 'p-invalid': submitted && !newLink.longLink }" />
+                        <InputText
+                            id="editLongLink"
+                            v-model.trim="newLink.longLink"
+                            required="true"
+                            :placeholder="newLink.longLink"
+                            autofocus
+                            :class="{ 'p-invalid': submitted && !newLink.longLink }"
+                        />
                     </div>
                     <div class="field">
                         <label for="editLongLink">备注</label>
-                        <InputText id="editComment" v-model.trim="newLink.comment" required="false" :placeholder="newLink.comment" autofocus />
+                        <InputText
+                            id="editComment"
+                            v-model.trim="newLink.comment"
+                            required="false"
+                            :placeholder="newLink.comment"
+                            autofocus
+                        />
                     </div>
                     <template #footer>
                         <Button label="取消" icon="pi pi-times" class="p-button-text" @click="cancelEditDialog" />
@@ -281,10 +331,17 @@ linkStore.fetchLinks();
                 </Dialog>
 
                 <!--DeleteDialog-->
-                <Dialog v-model:visible="deleteDialogVisible" :style="{ width: '450px' }" header="确认删除" :modal="true">
+                <Dialog
+                    v-model:visible="deleteDialogVisible"
+                    :style="{ width: '450px' }"
+                    header="确认删除"
+                    :modal="true"
+                >
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="toDeleteLinks" style="width: 100%">确认删除以下{{ toDeleteLinks.length }}个链接</span>
+                        <span v-if="toDeleteLinks" style="width: 100%"
+                            >确认删除以下{{ toDeleteLinks.length }}个链接</span
+                        >
                     </div>
                     <p></p>
                     <p class="mb-5">
@@ -294,13 +351,24 @@ linkStore.fetchLinks();
                         </DataTable>
                     </p>
                     <template #footer>
-                        <Button label="取消" icon="pi pi-times" class="p-button-text" @click="cancelDeleteDialog" autofocus />
+                        <Button
+                            label="取消"
+                            icon="pi pi-times"
+                            class="p-button-text"
+                            @click="cancelDeleteDialog"
+                            autofocus
+                        />
                         <Button label="确认" icon="pi pi-check" class="p-button-text" @click="confirmDeleteLink" />
                     </template>
                 </Dialog>
 
                 <!--AddLinksFromFileDialog-->
-                <Dialog v-model:visible="addLinkFromFileDialogVisible" :style="{ width: '450px' }" header="确认添加" :modal="true">
+                <Dialog
+                    v-model:visible="addLinkFromFileDialogVisible"
+                    :style="{ width: '450px' }"
+                    header="确认添加"
+                    :modal="true"
+                >
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
                         <span v-if="newLinks" style="width: 100%">确认添加以下{{ newLinks.length }}个链接</span>
@@ -314,8 +382,19 @@ linkStore.fetchLinks();
                     </p>
 
                     <template #footer>
-                        <Button label="取消" icon="pi pi-times" class="p-button-text" @click="cancelAddFromFileDialog" />
-                        <Button label="确认" icon="pi pi-check" class="p-button-text" @click="confirmAddFromFileDialog" autofocus />
+                        <Button
+                            label="取消"
+                            icon="pi pi-times"
+                            class="p-button-text"
+                            @click="cancelAddFromFileDialog"
+                        />
+                        <Button
+                            label="确认"
+                            icon="pi pi-check"
+                            class="p-button-text"
+                            @click="confirmAddFromFileDialog"
+                            autofocus
+                        />
                     </template>
                 </Dialog>
             </div>
