@@ -224,7 +224,7 @@ function removeAllSort() {
                             <Calendar
                                 v-model="rangeTimeKeywords"
                                 showIcon
-                                placeholder="时间段...选择两个日期"
+                                placeholder="时间段...选择两个日期（可重复）"
                                 selection-mode="range"
                                 date-format="yymmdd"
                                 showOtherMonths
