@@ -126,7 +126,7 @@ function confirmAllFilter() {
         region: regionKeywords.value,
         rangeTime: []
     };
-    if (rangeTimeKeywords.value && rangeTimeKeywords.value.length === 2) {
+    if (rangeTimeKeywords.value[0] && rangeTimeKeywords.value[1]) {
         options.rangeTime = [
             dateObjToDayBeginUnixTime(rangeTimeKeywords.value[0]),
             dateObjToDayEndUnixTime(rangeTimeKeywords.value[1])
