@@ -30,6 +30,7 @@ import MultiSelect from 'primevue/multiselect';
 import Fieldset from 'primevue/fieldset';
 import Calendar from 'primevue/calendar';
 import Chips from 'primevue/chips';
+import AutoComplete from 'primevue/autocomplete';
 
 // import localization from "/src/localization";
 import '@/assets/styles.scss';
@@ -38,8 +39,34 @@ const app = createApp(App);
 app.use(PrimeVue, {
     ripple: false,
     locale: {
-        monthNames: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
-        monthNamesShort: ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'],
+        monthNames: [
+            '一月',
+            '二月',
+            '三月',
+            '四月',
+            '五月',
+            '六月',
+            '七月',
+            '八月',
+            '九月',
+            '十月',
+            '十一月',
+            '十二月'
+        ],
+        monthNamesShort: [
+            '一月',
+            '二月',
+            '三月',
+            '四月',
+            '五月',
+            '六月',
+            '七月',
+            '八月',
+            '九月',
+            '十月',
+            '十一月',
+            '十二月'
+        ],
         firstDayOfWeek: 1,
         dayNamesMin: ['日', '一', '二', '三', '四', '五', '六']
     }
@@ -71,6 +98,7 @@ app.component('MultiSelect', MultiSelect);
 app.component('Fieldset', Fieldset);
 app.component('Calendar', Calendar);
 app.component('Chips', Chips);
+app.component('AutoComplete', AutoComplete);
 
 app.use(createPinia());
 app.use(router);

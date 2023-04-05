@@ -17,7 +17,7 @@ const state = () => {
          }
          */
         links: [],
-        linksTotal: 0,
+        linksTotal: '-',
         amountTotal: '-'
     };
 };
