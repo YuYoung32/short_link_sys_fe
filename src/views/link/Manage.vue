@@ -19,7 +19,11 @@ watch(amountTotal, (val) => {
 });
 
 //region 编辑/新建Dialog
-const newLink = ref({}); // 暂存单个信息编辑/新增时使用
+const newLinkDefault = {
+    longLink: '',
+    comment: ''
+};
+const newLink = ref(newLinkDefault); // 暂存单个信息编辑/新增时使用
 const editDialogSubmitType = ref(''); // 提交类型: add-新增, update-更新
 const submitted = ref(false); // 表单是否提交, 用于编辑链接时验证
 const editDialogHeader = ref('新增链接');
@@ -33,7 +37,7 @@ const openEditDialog = (linkItem) => {
     } else {
         // 新增
         editDialogHeader.value = '新增链接';
-        newLink.value = [];
+        newLink.value = newLinkDefault;
         editDialogSubmitType.value = 'add';
     }
     submitted.value = false; //防止重复点击
@@ -47,39 +51,38 @@ const cancelEditDialog = () => {
 // 编辑/新建Dialog-确认
 const confirmEditDialog = () => {
     submitted.value = true;
-    if (newLink.value.longLink && newLink.value.longLink.trim() && newLink.value.comment.trim()) {
-        // 更新
-        if (editDialogSubmitType.value === 'update') {
-            linkStore.updateLink(newLink.value).then((res) => {
+
+    // 更新
+    if (editDialogSubmitType.value === 'update') {
+        linkStore.updateLink(newLink.value).then((res) => {
+            if (res === true) {
+                linkStore.fetchLinks();
+                toast.add({ severity: 'success', summary: '成功', detail: '链接更新成功', life: 3000 });
+            } else {
+                toast.add({ severity: 'error', summary: '失败', detail: '链接更新失败', life: 3000 });
+            }
+        });
+    } else {
+        // 新增
+        linkStore
+            .addLink([
+                {
+                    longLink: newLink.value.longLink,
+                    comment: newLink.value.comment
+                }
+            ])
+            .then((res) => {
                 if (res === true) {
                     linkStore.fetchLinks();
-                    toast.add({ severity: 'success', summary: '成功', detail: '链接更新成功', life: 3000 });
+                    toast.add({ severity: 'success', summary: '成功', detail: '链接创建成功', life: 3000 });
                 } else {
-                    toast.add({ severity: 'error', summary: '失败', detail: '链接更新失败', life: 3000 });
+                    toast.add({ severity: 'error', summary: '失败', detail: '链接创建失败', life: 3000 });
                 }
             });
-        } else {
-            // 新增
-            linkStore
-                .addLink([
-                    {
-                        longLink: newLink.value.longLink,
-                        comment: newLink.value.comment
-                    }
-                ])
-                .then((res) => {
-                    if (res === true) {
-                        linkStore.fetchLinks();
-                        toast.add({ severity: 'success', summary: '成功', detail: '链接创建成功', life: 3000 });
-                    } else {
-                        toast.add({ severity: 'error', summary: '失败', detail: '链接创建失败', life: 3000 });
-                    }
-                });
-        }
-
-        editDialogVisible.value = false;
-        newLink.value = {};
     }
+
+    editDialogVisible.value = false;
+    newLink.value = newLinkDefault;
 };
 //endregion
 
@@ -179,7 +182,14 @@ const search = () => {
         linkStore.fetchLinks();
         return;
     }
-    linkStore.fetchLinks(searchKeyword.value, -1);
+    linkStore.fetchLinks(
+        {
+            longLink: searchKeyword.value,
+            shortLink: searchKeyword.value,
+            comment: searchKeyword.value
+        },
+        -1
+    );
 };
 //endregion
 

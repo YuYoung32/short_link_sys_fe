@@ -17,6 +17,7 @@ const state = () => {
          }
          */
         links: [],
+        linksTotal: 0,
         amountTotal: '-'
     };
 };
@@ -41,13 +42,24 @@ const actions = {
             });
     },
 
-    async fetchLinks(keyword = '', amount = 50) {
+    // 获取短链信息, keyword是短链长链或备注, keyword为空时获取全部
+    async fetchLinks(
+        keyword = {
+            shortLink: '',
+            longLink: '',
+            comment: ''
+        },
+        amount = 50
+    ) {
         axios
-            .get(`/link/details?keyword=${keyword}&amount=${amount}`)
+            .get(
+                `/link/details?shortLink=${keyword.shortLink}&longLink=${keyword.longLink}&comment=${keyword.comment}&amount=${amount}`
+            )
             .then((response) => {
                 this.fetchLinksAmountTotal();
                 if (response.status === 200) {
-                    this.links = response.data;
+                    this.links = response.data.links;
+                    this.linksTotal = response.data.linksTotal;
                     return true;
                 } else {
                     throw response.data.msg;
