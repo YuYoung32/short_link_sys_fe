@@ -9,21 +9,23 @@ import { unixTimeToString } from '@/service/utils';
 
 const state = () => {
     return {
-        // 过去一段时间的访问时段列表
-        visitAmountLastBetween: [],
-
-        // 某段时间的总访问量, 比getters的visitAmountLastBetweenTotal少请求细节
-        visitAmountTotal: '-',
+        // 过去一段时间的访问次数列表 Array[String]
+        visitAmount: [],
+        // 过去一段时间的访问IP数量列表 Array[String]
+        visitIPLastBetween: [],
 
         /**
-         * visitIPLast7D每一项结构
+         * Array[Object]
+         * Object结构:
          {
-            region: Code,
+            region: String,
             amount: Number,
          }
          */
-        // 过去一段时间的访问IP-数量 列表
-        visitIPLastBetween: [],
+        visitIPRegion: [],
+
+        // 某段时间的总访问量, 比getters的visitAmountLastBetweenTotal少请求细节
+        visitAmountBetween: '-',
 
         /** _visitDetails每一项结构
           {
@@ -36,15 +38,16 @@ const state = () => {
           }
          */
         _visitDetails: [],
-        // 因为最多返回1000条, 所以总数需要单独获取
+        // 因为details最多返回1000条, 所以总数需要单独获取
         visitDetailsAmount: '-'
     };
 };
 
 const getters = {
-    visitAmountLastBetweenTotal: (state) => {
-        return state.visitAmountLastBetween.reduce((a, b) => a + b, 0);
+    visitAmountTotal: (state) => {
+        return state.visitAmount.reduce((a, b) => a + b, 0);
     },
+    // 将里面的时间戳转换为日期
     visitDetails: (state) => {
         for (let i = 0; i < state._visitDetails.length; i++) {
             state._visitDetails[i].visitTime = unixTimeToString(state._visitDetails[i].visitTime);
@@ -54,12 +57,13 @@ const getters = {
 };
 
 const actions = {
-    async fetchVisitAmountLastBetween(begin, end) {
+    async fetchVisitStatics(begin = '', end = '', shortLink = '') {
         axios
-            .get(`/visit/amount?begin=${begin}&end=${end}`)
+            .get(`/visit/statics?begin=${begin}&end=${end}&shortLink=${shortLink}`)
             .then((response) => {
                 if (response.status === 200) {
-                    this.visitAmountLastBetween = response.data.amount;
+                    this.visitAmount = response.data.amount;
+                    this.visitIPLastBetween = response.data.ip;
                     return true;
                 } else {
                     throw response.data.msg;
@@ -72,29 +76,12 @@ const actions = {
     },
 
     // 与fetchVisitAmountLastBetween相比, 不需要获取具体列表, 直接获取总数
-    async fetchVisitAmountTotal(begin = '', end = '') {
+    async fetchVisitAmount(begin = '', end = '') {
         axios
             .get(`/visit/amountTotal?begin=${begin}&end=${end}`)
             .then((response) => {
                 if (response.status === 200) {
                     this.visitAmountTotal = response.data.amount;
-                    return true;
-                } else {
-                    throw response.data.msg;
-                }
-            })
-            .catch((msg) => {
-                console.error(msg);
-                return msg;
-            });
-    },
-
-    async fetchVisitIpXhr(x) {
-        axios
-            .get(`/visit/ipXhr?x=${x}`)
-            .then((response) => {
-                if (response.status === 200) {
-                    this.visitIPLastBetween = response.data.visitIPLastBetween;
                     return true;
                 } else {
                     throw response.data.msg;

@@ -290,7 +290,7 @@ function removeAllSort() {
                                 />
                             </div>
                             <div class="md:text-center font-normal sm:text-left my-2">
-                                已筛选{{ visitDetailsAmount }}条数据
+                                已筛选得到{{ visitDetailsAmount }}条数据
                             </div>
                             <div class="md:text-right sm:text-left">
                                 <Button

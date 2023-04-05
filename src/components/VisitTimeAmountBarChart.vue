@@ -10,7 +10,7 @@ import { storeToRefs } from 'pinia';
 
 const visitStore = useVisitStore();
 
-const { visitAmountLastBetween } = storeToRefs(visitStore);
+const { visitAmount } = storeToRefs(visitStore);
 
 const props = defineProps(['title', 'begin', 'end']);
 const titleRef = ref(props.title);
@@ -19,7 +19,7 @@ const xData = ref([]);
 watch(
     () => props,
     async (props) => {
-        await visitStore.fetchVisitAmountLastBetween(props.begin, props.end);
+        await visitStore.fetchVisitStatics(props.begin, props.end);
         xData.value = [];
 
         const startDate = new Date();
@@ -42,7 +42,7 @@ const data = reactive({
     labels: xData,
     datasets: [
         {
-            data: visitAmountLastBetween,
+            data: visitAmount,
             fill: true,
             borderColor: '#6366F1',
             backgroundColor: '#6366F1',
