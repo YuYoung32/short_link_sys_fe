@@ -39,7 +39,7 @@ function refreshCalendar() {
 
 // region 筛选短链
 const linkBySLKeyword = ref('');
-const filterDatatableShow = ref(false);
+const linkSummaryShow = ref(false);
 // endregion
 //endregion 筛选
 
@@ -159,12 +159,12 @@ function confirmFilter() {
     visitStore.fetchVisitStatics(
         dateObjToDayBeginUnixTime(dateKeywords.value[0]),
         dateObjToDayEndUnixTime(dateKeywords.value[1]),
-        linkBySLKeyword.value
+        linkBySLKeyword.value.shortLink
     );
     visitStore.fetchVisitIPRegion(
         dateObjToDayBeginUnixTime(dateKeywords.value[0]),
         dateObjToDayEndUnixTime(dateKeywords.value[1]),
-        linkBySLKeyword.value
+        linkBySLKeyword.value.shortLink
     );
 }
 
@@ -181,12 +181,12 @@ function search(event) {
 visitStore.fetchVisitStatics(
     dateObjToDayBeginUnixTime(dateKeywords.value[0]),
     dateObjToDayEndUnixTime(dateKeywords.value[1]),
-    linkBySLKeyword.value
+    linkBySLKeyword.value.shortLink
 );
 visitStore.fetchVisitIPRegion(
     dateObjToDayBeginUnixTime(dateKeywords.value[0]),
     dateObjToDayEndUnixTime(dateKeywords.value[1]),
-    linkBySLKeyword.value
+    linkBySLKeyword.value.shortLink
 );
 </script>
 
@@ -196,10 +196,10 @@ visitStore.fetchVisitIPRegion(
         <div class="col-12">
             <div class="card">
                 <h4>筛选</h4>
-                <div class="grid">
+                <div class="grid justify-content-center align-content-center">
                     <!--时间-->
                     <div class="mt-2 sm:col-12 md:col-6">
-                        <Card class="h-19rem">
+                        <Card style="min-height: 20rem">
                             <template v-slot:title>
                                 <h5 class="font-medium">时间（必选）</h5>
                             </template>
@@ -240,7 +240,7 @@ visitStore.fetchVisitIPRegion(
                                         <div class="flex">
                                             <Button
                                                 label="过去7天（默认）"
-                                                class="mr-2 w-4"
+                                                class="mr-2"
                                                 @click="
                                                     dateKeywords[0] = lastWeek;
                                                     dateKeywords[1] = lastDay;
@@ -249,7 +249,7 @@ visitStore.fetchVisitIPRegion(
                                             ></Button>
                                             <Button
                                                 label="过去15天"
-                                                class="mr-2 w-4"
+                                                class="mr-2"
                                                 @click="
                                                     dateKeywords[0] = last15Days;
                                                     dateKeywords[1] = lastDay;
@@ -258,7 +258,7 @@ visitStore.fetchVisitIPRegion(
                                             ></Button>
                                             <Button
                                                 label="过去30天"
-                                                class="w-4"
+                                                class=""
                                                 @click="
                                                     dateKeywords[0] = last30Days;
                                                     dateKeywords[1] = lastDay;
@@ -273,7 +273,7 @@ visitStore.fetchVisitIPRegion(
                     </div>
                     <!--短链-->
                     <div class="mt-2 sm:col-12 md:col-6">
-                        <Card class="h-19rem">
+                        <Card style="min-height: 20rem">
                             <template v-slot:title>
                                 <h5 class="font-medium">短链</h5>
                             </template>
@@ -288,8 +288,8 @@ visitStore.fetchVisitIPRegion(
                                         force-selection
                                         placeholder="短链或长链的关键字..."
                                         :delay="500"
-                                        @focus="filterDatatableShow = false"
-                                        @blur="filterDatatableShow = true"
+                                        @focus="linkSummaryShow = false"
+                                        @blur="linkSummaryShow = true"
                                     >
                                         <template #empty>
                                             <div class="flex align-items-center justify-content-center">
@@ -313,12 +313,12 @@ visitStore.fetchVisitIPRegion(
                                     </AutoComplete>
                                     <div class="card py-2 px-3 mt-4">
                                         <h6>当前短链信息：</h6>
-                                        <div v-if="!(filterDatatableShow && linkBySLKeyword)">
+                                        <div v-if="!(linkSummaryShow && linkBySLKeyword)">
                                             <h3 class="flex align-items-center justify-content-center text-500">
                                                 未选择
                                             </h3>
                                         </div>
-                                        <div v-if="filterDatatableShow && linkBySLKeyword">
+                                        <div v-if="linkSummaryShow && linkBySLKeyword">
                                             短链：{{ linkBySLKeyword.shortLink }}
                                             <br />
                                             长链：{{ linkBySLKeyword.longLink }}
