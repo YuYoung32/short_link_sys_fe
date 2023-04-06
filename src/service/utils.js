@@ -53,6 +53,62 @@ function stringToDateObj(dateString) {
 }
 
 /**
+ * 将Date对象转换为字符串(YYYYMMDD)
+ * @param {Date} date
+ * @returns {string}
+ */
+function dateObjToString(date) {
+    const year = date.getFullYear();
+    const month = ('0' + (date.getMonth() + 1)).slice(-2);
+    const day = ('0' + date.getDate()).slice(-2);
+    return `${year}${month}${day}`;
+}
+
+/**
+ * 将两个Date对象转换为之间的字符串(MMDD) 若为同一天则返回当天1h-24h
+ * 例如: 0301, 0303 -> [0301, 0302, 0303]
+ * @param {Date} begin
+ * @param {Date} end
+ * @returns {Array}
+ */
+function dateBetweenToList(begin, end) {
+    if (dateObjToString(begin) === dateObjToString(end)) {
+        return [
+            '1h',
+            '2h',
+            '3h',
+            '4h',
+            '5h',
+            '6h',
+            '7h',
+            '8h',
+            '9h',
+            '10h',
+            '11h',
+            '12h',
+            '13h',
+            '14h',
+            '15h',
+            '16h',
+            '17h',
+            '18h',
+            '19h',
+            '20h',
+            '21h',
+            '22h',
+            '23h',
+            '24h'
+        ];
+    }
+    const list = [];
+    while (begin.getTime() <= end.getTime()) {
+        list.push(dateObjToString(begin).substring(4, 8));
+        begin.setDate(begin.getDate() + 1);
+    }
+    return list;
+}
+
+/**
  * 原地移动数组 从数组头部删除一个元素 从数组尾部添加一个元素
  * @param {Array} arr  数组
  * @param {Any}  val  要添加的元素
@@ -93,10 +149,12 @@ function getArrIndexByEle(ele, arr, key) {
 
 export {
     dateObjToDayBeginUnixTime,
+    dateObjToDayEndUnixTime,
+    unixTimeToString,
+    stringToDateObj,
+    dateObjToString,
+    dateBetweenToList,
     pushAndPop,
     getTodayDayValue,
-    getArrIndexByEle,
-    unixTimeToString,
-    dateObjToDayEndUnixTime,
-    stringToDateObj
+    getArrIndexByEle
 };

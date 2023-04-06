@@ -62,8 +62,8 @@ const actions = {
             .get(`/visit/statics?begin=${begin}&end=${end}&shortLink=${shortLink}`)
             .then((response) => {
                 if (response.status === 200) {
-                    this.visitAmount = response.data.amount;
-                    this.visitIPLastBetween = response.data.ip;
+                    this.visitAmount = response.data.visitAmount;
+                    this.visitIPLastBetween = response.data.ipAmount;
                     return true;
                 } else {
                     throw response.data.msg;

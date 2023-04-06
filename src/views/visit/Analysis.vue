@@ -3,18 +3,23 @@
  * Created by YuYoung on 2023/3/23
  * Description: 访问分析
  */
-import { nextTick, ref } from 'vue';
+import { nextTick, ref, watch } from 'vue';
 import { useLinkStore } from '@/store/link';
+import { useVisitStore } from '@/store/visit';
 import { storeToRefs } from 'pinia/dist/pinia';
-import { unixTimeToString } from '@/service/utils';
+import {
+    dateBetweenToList,
+    dateObjToDayBeginUnixTime,
+    dateObjToDayEndUnixTime,
+    unixTimeToString
+} from '@/service/utils';
 
-// import { useVisitStore } from '@/store/visit';
-// import { dateObjToDayBeginUnixTime, dateObjToDayEndUnixTime } from '@/service/utils';
-
-// const visitStore = useVisitStore();
+const visitStore = useVisitStore();
 const linkStore = useLinkStore();
 const { links, linksTotal } = storeToRefs(linkStore);
+const { visitAmount, visitIPLastBetween } = storeToRefs(visitStore);
 
+//region 筛选
 // region 筛选日期
 const lastDay = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
 const lastWeek = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -36,13 +41,49 @@ function refreshCalendar() {
 const linkBySLKeyword = ref('');
 const filterDatatableShow = ref(false);
 // endregion
+//endregion 筛选
+
+// region 图表-访问量和IP量
+const labelDateList = ref([]);
+watch(
+    () => visitAmount.value,
+    () => {
+        labelDateList.value = dateBetweenToList(dateKeywords.value[0], dateKeywords.value[1]);
+    }
+);
+const lineData = ref({
+    labels: labelDateList,
+    datasets: [
+        {
+            label: '访问数量',
+            data: visitAmount,
+            fill: false,
+            backgroundColor: '#6366f1',
+            borderColor: '#6366f1',
+            tension: 0.1
+        },
+        {
+            label: '访问IP数量',
+            data: visitIPLastBetween,
+            fill: false,
+            backgroundColor: '#bcbdf9',
+            borderColor: '#bcbdf9',
+            tension: 0.1
+        }
+    ]
+});
+const lineOptions = ref({
+    animation: true,
+    maintainAspectRatio: false // 是否保持长宽比
+});
+//endregion
 
 function confirmFilter() {
-    // visitStore.fetchVisitStatics(
-    //     dateObjToDayBeginUnixTime(dateKeywords[0]),
-    //     dateObjToDayEndUnixTime(dateKeywords[1]),
-    //     linkBySLKeyword
-    // );
+    visitStore.fetchVisitStatics(
+        dateObjToDayBeginUnixTime(dateKeywords.value[0]),
+        dateObjToDayEndUnixTime(dateKeywords.value[1]),
+        linkBySLKeyword.value
+    );
 }
 
 function clearAllFilter() {
@@ -55,15 +96,11 @@ function search(event) {
     linkStore.fetchLinks({ shortLink: query, longLink: query, comment: '' }, -1);
 }
 
-// watch(
-//     dateKeywords,
-//     (val) => {
-//         if (val.length === 2) {
-//             visitStore.fetchVisitStatics(dateObjToDayBeginUnixTime(val[0]), dateObjToDayEndUnixTime(val[1]));
-//         }
-//     },
-//     { deep: true, immediate: true }
-// );
+visitStore.fetchVisitStatics(
+    dateObjToDayBeginUnixTime(dateKeywords.value[0]),
+    dateObjToDayEndUnixTime(dateKeywords.value[1]),
+    linkBySLKeyword.value
+);
 </script>
 
 <template>
@@ -230,10 +267,15 @@ function search(event) {
     </div>
     <!--统计数据图表-->
     <div class="grid p-fluid">
-        <div class="col-12 xl:col-6">
+        <div class="col-12">
             <div class="card">
-                <h5>Linear Chart</h5>
-                <Chart type="line" :data="lineData" :options="lineOptions"></Chart>
+                <h5>访问-时间 曲线图</h5>
+                <h3 v-if="visitAmount.length <= 0" class="flex align-items-center justify-content-center text-500 my-6">
+                    无数据
+                </h3>
+                <div v-if="visitAmount.length > 0">
+                    <Chart type="line" :data="lineData" :options="lineOptions" style="min-height: 20rem"></Chart>
+                </div>
             </div>
         </div>
     </div>
