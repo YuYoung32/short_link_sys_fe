@@ -12,17 +12,10 @@ const state = () => {
         // 过去一段时间的访问次数列表 Array[String]
         visitAmount: [],
         // 过去一段时间的访问IP数量列表 Array[String]
-        visitIPLastBetween: [],
+        visitIPAmount: [],
 
-        /**
-         * Array[Object]
-         * Object结构:
-         {
-            region: String,
-            amount: Number,
-         }
-         */
         visitIPRegion: [],
+        visitIPRegionAmount: [],
 
         // 某段时间的总访问量, 比getters的visitAmountLastBetweenTotal少请求细节
         visitAmountBetween: '-',
@@ -63,7 +56,24 @@ const actions = {
             .then((response) => {
                 if (response.status === 200) {
                     this.visitAmount = response.data.visitAmount;
-                    this.visitIPLastBetween = response.data.ipAmount;
+                    this.visitIPAmount = response.data.ipAmount;
+                    return true;
+                } else {
+                    throw response.data.msg;
+                }
+            })
+            .catch((msg) => {
+                console.error(msg);
+                return msg;
+            });
+    },
+    async fetchVisitIPRegion(begin = '', end = '', shortLink = '') {
+        axios
+            .get(`/visit/ip?begin=${begin}&end=${end}&shortLink=${shortLink}`)
+            .then((response) => {
+                if (response.status === 200) {
+                    this.visitIPRegion = response.data.region;
+                    this.visitIPRegionAmount = response.data.amount;
                     return true;
                 } else {
                     throw response.data.msg;

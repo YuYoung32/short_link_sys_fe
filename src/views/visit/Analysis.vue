@@ -17,7 +17,7 @@ import {
 const visitStore = useVisitStore();
 const linkStore = useLinkStore();
 const { links, linksTotal } = storeToRefs(linkStore);
-const { visitAmount, visitIPLastBetween } = storeToRefs(visitStore);
+const { visitAmount, visitIPAmount, visitIPRegion, visitIPRegionAmount } = storeToRefs(visitStore);
 
 //region 筛选
 // region 筛选日期
@@ -43,7 +43,7 @@ const filterDatatableShow = ref(false);
 // endregion
 //endregion 筛选
 
-// region 图表-访问量和IP量
+// region 图表-访问量和IP量折线图
 const labelDateList = ref([]);
 watch(
     () => visitAmount.value,
@@ -57,17 +57,19 @@ const lineData = ref({
         {
             label: '访问数量',
             data: visitAmount,
-            fill: false,
             backgroundColor: '#6366f1',
+            borderWidth: 2,
+            pointRadius: 2,
             borderColor: '#6366f1',
             tension: 0.1
         },
         {
             label: '访问IP数量',
-            data: visitIPLastBetween,
-            fill: false,
-            backgroundColor: '#bcbdf9',
-            borderColor: '#bcbdf9',
+            data: visitIPAmount,
+            borderWidth: 2,
+            pointRadius: 2,
+            backgroundColor: '#8a2be2',
+            borderColor: '#8a2be2',
             tension: 0.1
         }
     ]
@@ -78,8 +80,88 @@ const lineOptions = ref({
 });
 //endregion
 
+// region 图表-访问IP饼状图
+// eslint-disable-next-line no-unused-vars
+const provinceToColor = {
+    安徽: '#ff4500',
+    北京: '#8fbc8f',
+    重庆: '#34568B',
+    福建: '#FF6F61',
+    甘肃: '#ffd700',
+    广东: '#1e90ff',
+    广西: '#32cd32',
+    贵州: '#f08080',
+    海南: '#bdb76b',
+    河北: '#6B5B95',
+    河南: '#20b2aa',
+    黑龙江: '#9932cc',
+    湖北: '#00ffff',
+    湖南: '#ff7f50',
+    吉林: '#9acd32',
+    江苏: '#ff8c00',
+    江西: '#5f9ea0',
+    辽宁: '#00bfff',
+    内蒙古: '#88B04B',
+    宁夏: '#66cdaa',
+    青海: '#8a2be2',
+    山东: '#F7CAC9',
+    山西: '#00fa9a',
+    陕西: '#7b68ee',
+    上海: '#dc143c',
+    四川: '#00ced1',
+    台湾: '#556b2f',
+    天津: '#b03060',
+    西藏: '#955251',
+    新疆: '#4682b4',
+    云南: '#d2b48c',
+    浙江: '#55B4B0',
+    香港: '#2f4f4f',
+    澳门: '#00ff7f',
+    海外: '#ffa07a',
+    未知: '#556b2f'
+};
+const pieColors = ref([]);
+watch(
+    () => visitIPRegion.value,
+    (val) => {
+        pieColors.value = [];
+        for (let i = 0; i < val.length; i++) {
+            try {
+                pieColors.value.push(provinceToColor[val[i]]);
+            } catch (e) {
+                pieColors.value.push('#556b2f');
+            }
+        }
+    }
+);
+const pieData = ref({
+    labels: visitIPRegion,
+    datasets: [
+        {
+            data: visitIPRegionAmount,
+            backgroundColor: pieColors
+        }
+    ]
+});
+const pieOptions = ref({
+    maintainAspectRatio: false, // 是否保持长宽比
+    plugins: {
+        legend: {
+            labels: {
+                usePointStyle: true
+            }
+        }
+    }
+});
+//endregion
+
 function confirmFilter() {
     visitStore.fetchVisitStatics(
+        dateObjToDayBeginUnixTime(dateKeywords.value[0]),
+        dateObjToDayEndUnixTime(dateKeywords.value[1]),
+        linkBySLKeyword.value
+    );
+    visitStore.fetchVisitIPRegion(
         dateObjToDayBeginUnixTime(dateKeywords.value[0]),
         dateObjToDayEndUnixTime(dateKeywords.value[1]),
         linkBySLKeyword.value
@@ -101,11 +183,16 @@ visitStore.fetchVisitStatics(
     dateObjToDayEndUnixTime(dateKeywords.value[1]),
     linkBySLKeyword.value
 );
+visitStore.fetchVisitIPRegion(
+    dateObjToDayBeginUnixTime(dateKeywords.value[0]),
+    dateObjToDayEndUnixTime(dateKeywords.value[1]),
+    linkBySLKeyword.value
+);
 </script>
 
 <template>
-    <!--筛选-->
     <div class="grid">
+        <!--筛选-->
         <div class="col-12">
             <div class="card">
                 <h4>筛选</h4>
@@ -264,12 +351,10 @@ visitStore.fetchVisitStatics(
                 </div>
             </div>
         </div>
-    </div>
-    <!--访问量 折线图-->
-    <div class="grid p-fluid">
+        <!--访问量 折线图-->
         <div class="col-12 xl:col-6">
             <div class="card">
-                <h5>访问-时间 曲线图</h5>
+                <h5>访问-时间</h5>
                 <h3 v-if="visitAmount.length <= 0" class="flex align-items-center justify-content-center text-500 my-6">
                     无数据
                 </h3>
@@ -278,15 +363,13 @@ visitStore.fetchVisitStatics(
                 </div>
             </div>
         </div>
-    </div>
-    <!--IP来源 饼状图-->
-    <div class="grid p-fluid">
+        <!--IP来源 饼状图-->
         <div class="col-12 xl:col-6">
             <div class="card">
-                <h5>访问-时间 曲线图</h5>
+                <h5>访问IP来源</h5>
                 <h3 v-if="1 <= 0" class="flex align-items-center justify-content-center text-500 my-6">无数据</h3>
                 <div v-if="1 > 0">
-                    <Chart type="pie" :data="pieData" :options="pieOptions"></Chart>
+                    <Chart type="pie" :data="pieData" :options="pieOptions" style="min-height: 20rem"></Chart>
                 </div>
             </div>
         </div>
