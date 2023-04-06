@@ -367,9 +367,14 @@ visitStore.fetchVisitIPRegion(
         <div class="col-12 xl:col-6">
             <div class="card">
                 <h5>访问IP来源</h5>
-                <h3 v-if="1 <= 0" class="flex align-items-center justify-content-center text-500 my-6">无数据</h3>
-                <div v-if="1 > 0">
-                    <Chart type="pie" :data="pieData" :options="pieOptions" style="min-height: 20rem"></Chart>
+                <h3
+                    v-if="visitIPAmount.length <= 0"
+                    class="flex align-items-center justify-content-center text-500 my-6"
+                >
+                    无数据
+                </h3>
+                <div v-if="visitIPAmount.length > 0">
+                    <Chart type="pie" :data="pieData" :options="pieOptions" style="min-height: 20rem" />
                 </div>
             </div>
         </div>
