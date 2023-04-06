@@ -265,9 +265,9 @@ visitStore.fetchVisitStatics(
             </div>
         </div>
     </div>
-    <!--统计数据图表-->
+    <!--访问量 折线图-->
     <div class="grid p-fluid">
-        <div class="col-12">
+        <div class="col-12 xl:col-6">
             <div class="card">
                 <h5>访问-时间 曲线图</h5>
                 <h3 v-if="visitAmount.length <= 0" class="flex align-items-center justify-content-center text-500 my-6">
@@ -275,6 +275,18 @@ visitStore.fetchVisitStatics(
                 </h3>
                 <div v-if="visitAmount.length > 0">
                     <Chart type="line" :data="lineData" :options="lineOptions" style="min-height: 20rem"></Chart>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--IP来源 饼状图-->
+    <div class="grid p-fluid">
+        <div class="col-12 xl:col-6">
+            <div class="card">
+                <h5>访问-时间 曲线图</h5>
+                <h3 v-if="1 <= 0" class="flex align-items-center justify-content-center text-500 my-6">无数据</h3>
+                <div v-if="1 > 0">
+                    <Chart type="pie" :data="pieData" :options="pieOptions"></Chart>
                 </div>
             </div>
         </div>
