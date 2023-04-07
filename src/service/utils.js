@@ -109,6 +109,23 @@ function dateBetweenToList(begin, end) {
 }
 
 /**
+ * 格式化秒数为 d:hh:mm:ss
+ * @param timeInSeconds
+ * @returns {string}
+ */
+function formatSeconds(timeInSeconds) {
+    if (timeInSeconds === 0) {
+        return '0';
+    }
+    const days = Math.floor(timeInSeconds / (60 * 60 * 24));
+    const hours = String(Math.floor((timeInSeconds % (60 * 60 * 24)) / (60 * 60))).padStart(2, '0');
+    const minutes = String(Math.floor((timeInSeconds % (60 * 60)) / 60)).padStart(2, '0');
+    const seconds = String(timeInSeconds % 60).padStart(2, '0');
+
+    return `${days}:${hours}:${minutes}:${seconds}`;
+}
+
+/**
  * 原地移动数组 从数组头部删除一个元素 从数组尾部添加一个元素
  * @param {Array} arr  数组
  * @param {Any}  val  要添加的元素
@@ -154,6 +171,7 @@ export {
     stringToDateObj,
     dateObjToString,
     dateBetweenToList,
+    formatSeconds,
     pushAndPop,
     getTodayDayValue,
     getArrIndexByEle
