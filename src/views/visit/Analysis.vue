@@ -333,7 +333,7 @@ visitStore.fetchVisitIPRegion(
                         </Card>
                     </div>
                 </div>
-                <div class="flex align-content-center justify-content-end">
+                <div class="flex justify-content-end align-content-center">
                     <div class="my-2">
                         <Button
                             label="确认筛选"
