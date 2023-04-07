@@ -141,27 +141,22 @@ function pushAndPop(arr, val) {
 }
 
 /**
- * 获取今天是几号
- * @returns {Number}
+ * 将MB转换为GB, 保留两位小数, 小于1GB时返回原值
+ * @returns {string}
+ * @param bytes
  */
-function getTodayDayValue() {
-    return new Date().getDate();
-}
-
-/**
- * 获取数组中某个元素的索引
- * @param ele 要查找的元素
- * @param arr 数组
- * @param key 数组中元素的key
- * @returns {Number}
- */
-function getArrIndexByEle(ele, arr, key) {
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[key] === ele) {
-            return i;
-        }
+function autoTransferMemUnit(bytes) {
+    if (bytes == 0) {
+        return '0';
     }
-    return -1; // 如果未找到该元素，则返回 -1
+    const sizeInMegabytes = bytes / 1024 / 1024;
+    if (sizeInMegabytes < 1) {
+        return bytes + 'B';
+    }
+    if (sizeInMegabytes < 1024) {
+        return sizeInMegabytes.toFixed(1) + 'MB';
+    }
+    return (sizeInMegabytes / 1024).toFixed(1) + 'GB';
 }
 
 export {
@@ -173,6 +168,5 @@ export {
     dateBetweenToList,
     formatSeconds,
     pushAndPop,
-    getTodayDayValue,
-    getArrIndexByEle
+    autoTransferMemUnit
 };

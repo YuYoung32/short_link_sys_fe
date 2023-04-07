@@ -10,19 +10,20 @@ import { pushAndPop } from '@/service/utils';
 const state = () => {
     return {
         isOnline: false,
-        memTotalSize: '-',
         diskTotalSize: '-',
-
-        cpuFreq: '-', //单位MHz
-        cpuRunningTime: 0, //单位秒
 
         ttlLastXHour: [],
 
         cpuUsageRatioLastSec: 0,
         cpuUsageRatioLastMin: [], //首次获取后，以后从cpuUsageRatioLastSec叠加
+        cpuFreq: '-', //单位MHz
+        cpuRunningTime: 0, //单位秒
 
         memUsageRatioLastSec: 0,
         memUsageRatioLastMin: [], //首次获取后，以后从memUsageRatioLastSec叠加
+        memUsageLastSec: 0, //单位B
+        memAvailLastSec: 0,
+        swapUsageLastSec: 0,
 
         diskUsageRatioLastSec: 0,
         diskUsageRatioLastMin: [], //首次获取后，以后从diskUsageRatioLastSec叠加
@@ -36,6 +37,10 @@ const state = () => {
             coreNum: '-',
             threadNum: '-',
             cacheSize: '-' //单位MB
+        },
+        memStaticInfo: {
+            physicalTotalSize: '-',
+            swapTotalSize: '-'
         }
     };
 };
@@ -58,9 +63,9 @@ const actions = {
             .get('/server/staticInfo')
             .then((response) => {
                 if (response.status === 200) {
-                    this.memTotalSize = response.data.memTotalSize;
-                    this.diskTotalSize = response.data.diskTotalSize;
                     this.cpuStaticInfo = response.data.cpuStaticInfo;
+                    this.memStaticInfo = response.data.memStaticInfo;
+                    this.diskTotalSize = response.data.diskTotalSize;
                     return true;
                 } else {
                     throw response.data.msg;
@@ -107,12 +112,17 @@ const actions = {
 
                 objThis.cpuUsageRatioLastSec = info.cpuUsageRatioLastSec;
                 pushAndPop(objThis.cpuUsageRatioLastMin, info.cpuUsageRatioLastSec);
-                objThis.memUsageRatioLastSec = info.memUsageRatioLastSec;
-                pushAndPop(objThis.memUsageRatioLastMin, info.memUsageRatioLastSec);
-                objThis.diskUsageRatioLastSec = info.diskUsageRatioLastSec;
-                pushAndPop(objThis.diskUsageRatioLastMin, info.diskUsageRatioLastSec);
                 objThis.cpuFreq = info.cpuFreqLastSec;
                 objThis.cpuRunningTime = info.runningTime;
+
+                objThis.memUsageRatioLastSec = info.memUsageRatioLastSec;
+                pushAndPop(objThis.memUsageRatioLastMin, info.memUsageRatioLastSec);
+                objThis.memUsageLastSec = info.memUsageLastSec;
+                objThis.memAvailLastSec = info.memAvailLastSec;
+                objThis.swapUsageLastSec = info.swapUsageLastSec;
+
+                objThis.diskUsageRatioLastSec = info.diskUsageRatioLastSec;
+                pushAndPop(objThis.diskUsageRatioLastMin, info.diskUsageRatioLastSec);
             });
 
             // 不允许server主动关闭连接
