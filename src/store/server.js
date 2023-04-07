@@ -13,27 +13,30 @@ const state = () => {
         memTotalSize: '-',
         diskTotalSize: '-',
 
-        xHourTimePoints: [],
-        cpuUsageRatioLastXHour: [],
-        memUsageRatioLastXHour: [],
-        diskUsageRatioLastXHour: [],
+        cpuFreq: '-', //单位MHz
+        cpuRunningTime: 0, //单位秒
+
         ttlLastXHour: [],
 
         cpuUsageRatioLastSec: 0,
         cpuUsageRatioLastMin: [], //首次获取后，以后从cpuUsageRatioLastSec叠加
-        cpuUsageRatioLast48Hours: [],
 
         memUsageRatioLastSec: 0,
         memUsageRatioLastMin: [], //首次获取后，以后从memUsageRatioLastSec叠加
-        memUsageRatioLast48Hours: [],
 
         diskUsageRatioLastSec: 0,
         diskUsageRatioLastMin: [], //首次获取后，以后从diskUsageRatioLastSec叠加
-        diskUsageRatioLast48Hours: [],
 
         ttlLast48Hours: [],
 
-        wsInvokeTimes: 0
+        wsInvokeTimes: 0,
+
+        cpuStaticInfo: {
+            name: '-',
+            coreNum: '-',
+            threadNum: '-',
+            cacheSize: '-' //单位MB
+        }
     };
 };
 
@@ -57,6 +60,7 @@ const actions = {
                 if (response.status === 200) {
                     this.memTotalSize = response.data.memTotalSize;
                     this.diskTotalSize = response.data.diskTotalSize;
+                    this.cpuStaticInfo = response.data.cpuStaticInfo;
                     return true;
                 } else {
                     throw response.data.msg;
@@ -107,6 +111,8 @@ const actions = {
                 pushAndPop(objThis.memUsageRatioLastMin, info.memUsageRatioLastSec);
                 objThis.diskUsageRatioLastSec = info.diskUsageRatioLastSec;
                 pushAndPop(objThis.diskUsageRatioLastMin, info.diskUsageRatioLastSec);
+                objThis.cpuFreq = info.cpuFreqLastSec;
+                objThis.cpuRunningTime = info.runningTime;
             });
 
             // 不允许server主动关闭连接
@@ -125,35 +131,8 @@ const actions = {
         wsConnect();
     },
 
-    async fetchInfoLastXHour(x) {
-        axios
-            .get(`/server/InfoXhr?x=${x}`)
-            .then((response) => {
-                if (response.status === 200) {
-                    this.cpuUsageRatioLastXHour = response.data.cpuUsageRatioLastXHour;
-                    this.memUsageRatioLastXHour = response.data.memUsageRatioLastXHour;
-                    this.diskUsageRatioLastXHour = response.data.diskUsageRatioLastXHour;
-                    this.ttlLastXHour = response.data.ttlLastXHour;
-                    this.xHourTimePoints = response.data.xHourTimePoints;
-                    if (x === 48) {
-                        this.cpuUsageRatioLast48Hours = response.data.cpuUsageRatioLastXHour;
-                        this.memUsageRatioLast48Hours = response.data.memUsageRatioLastXHour;
-                        this.diskUsageRatioLast48Hours = response.data.diskUsageRatioLastXHour;
-                        this.ttlLast48Hours = response.data.ttlLastXHour;
-                    }
-                    return true;
-                } else {
-                    throw response.data.msg;
-                }
-            })
-            .catch((msg) => {
-                console.error(msg);
-                return msg;
-            });
-    },
-
     async fetchInfoLast1Min() {
-        axios
+        return axios
             .get('/server/info1Min')
             .then((response) => {
                 if (response.status === 200) {
