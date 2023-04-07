@@ -159,6 +159,15 @@ function autoTransferMemUnit(bytes) {
     return (sizeInMegabytes / 1024).toFixed(1) + 'GB';
 }
 
+/**
+ * 将字节转换为GB
+ * @param b
+ * @returns {string}
+ */
+function bToGb(b) {
+    return (b / 1024 / 1024 / 1024).toFixed(1);
+}
+
 export {
     dateObjToDayBeginUnixTime,
     dateObjToDayEndUnixTime,
@@ -168,5 +177,6 @@ export {
     dateBetweenToList,
     formatSeconds,
     pushAndPop,
-    autoTransferMemUnit
+    autoTransferMemUnit,
+    bToGb
 };

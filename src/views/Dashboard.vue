@@ -9,15 +9,15 @@ import { useServerStore } from '@/store/server';
 import { useLinkStore } from '@/store/link';
 import { useVisitStore } from '@/store/visit';
 import DataShowCard from '@/components/DataShowCard';
-import Cpu1MinLineChart from '@/components/Cpu1MinLineChart';
 import VisitTimeAmountBarChart from '@/components/VisitTimeAmountBarChart';
 import { dateObjToDayBeginUnixTime, dateObjToDayEndUnixTime } from '@/service/utils';
+import OneMinLineChart from '@/components/OneMinLineChart.vue';
 
 const serverStore = useServerStore();
 const linkStore = useLinkStore();
 const visitStore = useVisitStore();
 
-const { isOnline, avgCPURatioLastMin } = storeToRefs(serverStore);
+const { isOnline, avgCPURatioLastMin, cpuUsageRatioLastMin } = storeToRefs(serverStore);
 const { amountTotal } = storeToRefs(linkStore);
 const { visitAmountTotal } = storeToRefs(visitStore);
 
@@ -39,7 +39,18 @@ linkStore.fetchLinksAmountTotal();
         <!-- 4 过去1分钟CPU平均占用率 -->
         <data-show-card title="1分钟CPU平均使用" :msg="avgCPURatioLastMin + ' %'" />
 
-        <cpu1-min-line-chart />
+        <div class="col-12 xl:col-6">
+            <OneMinLineChart
+                title="CPU"
+                :data="cpuUsageRatioLastMin"
+                border-color="rgba(255, 0, 0, 0.72)"
+                backgroundColor="rgba(255, 0, 0, 0.36)"
+                unit="使用率%"
+                max-unit="100%"
+                :min="0"
+                :max="100"
+            ></OneMinLineChart>
+        </div>
         <visit-time-amount-bar-chart
             title="7天访问量"
             :begin="dateObjToDayBeginUnixTime(new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000))"

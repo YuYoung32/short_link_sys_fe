@@ -19,8 +19,7 @@ const state = () => {
         cpuFreq: '-', //单位MHz
         cpuRunningTime: 0, //单位秒
 
-        memUsageRatioLastSec: 0,
-        memUsageRatioLastMin: [], //首次获取后，以后从memUsageRatioLastSec叠加
+        memUsageLastMin: [], //首次获取后，以后从memUsageLastSec叠加
         memUsageLastSec: 0, //单位B
         memAvailLastSec: 0,
         swapUsageLastSec: 0,
@@ -46,14 +45,11 @@ const state = () => {
 };
 
 const getters = {
-    mbToGb: (state) => {
-        return {
-            memTotalSize: (state.memTotalSize / 1024).toFixed(2),
-            diskTotalSize: (state.diskTotalSize / 1024).toFixed(2)
-        };
-    },
     avgCPURatioLastMin: (state) => {
         return (state.cpuUsageRatioLastMin.reduce((a, b) => a + b, 0) / state.cpuUsageRatioLastMin.length).toFixed(2);
+    },
+    memUsageRatioLastSec: (state) => {
+        return ((state.memUsageLastSec / state.memStaticInfo.physicalTotalSize) * 100).toFixed(0);
     }
 };
 
@@ -115,8 +111,7 @@ const actions = {
                 objThis.cpuFreq = info.cpuFreqLastSec;
                 objThis.cpuRunningTime = info.runningTime;
 
-                objThis.memUsageRatioLastSec = info.memUsageRatioLastSec;
-                pushAndPop(objThis.memUsageRatioLastMin, info.memUsageRatioLastSec);
+                pushAndPop(objThis.memUsageLastMin, info.memUsageLastSec);
                 objThis.memUsageLastSec = info.memUsageLastSec;
                 objThis.memAvailLastSec = info.memAvailLastSec;
                 objThis.swapUsageLastSec = info.swapUsageLastSec;
@@ -147,7 +142,7 @@ const actions = {
             .then((response) => {
                 if (response.status === 200) {
                     this.cpuUsageRatioLastMin = response.data.cpuUsageRatioLastMin;
-                    this.memUsageRatioLastMin = response.data.memUsageRatioLastMin;
+                    this.memUsageLastMin = response.data.memUsageLastMin;
                     this.diskUsageRatioLastMin = response.data.diskUsageRatioLastMin;
                     return true;
                 } else {

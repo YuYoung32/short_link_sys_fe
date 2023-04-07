@@ -4,10 +4,11 @@
  * Description: 性能监控
  */
 
-import { reactive, ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 import { useServerStore } from '@/store/server';
 import { storeToRefs } from 'pinia/dist/pinia';
-import { autoTransferMemUnit, formatSeconds } from '@/service/utils';
+import { autoTransferMemUnit, bToGb, formatSeconds } from '@/service/utils';
+import OneMinLineChart from '@/components/OneMinLineChart.vue';
 
 const serverStore = useServerStore();
 const {
@@ -16,11 +17,13 @@ const {
     cpuFreq,
     cpuRunningTime,
 
-    memUsageRatioLastMin,
+    memUsageLastMin,
     memStaticInfo,
     memUsageLastSec,
     memAvailLastSec,
     swapUsageLastSec
+
+    // diskUsageRatioLastMin
 } = storeToRefs(serverStore);
 
 // region 1分钟x坐标轴
@@ -28,67 +31,37 @@ const minuteLabels = ref([]);
 for (let i = 0; i < 60; i++) {
     minuteLabels.value.push('');
 }
-minuteLabels.value[0] = '60秒';
-minuteLabels.value[29] = '30秒';
-minuteLabels.value[30] = '31秒';
-minuteLabels.value[57] = '2秒';
-minuteLabels.value[58] = '1秒';
-minuteLabels.value[59] = '0秒';
+minuteLabels.value[0] = '       60秒';
+minuteLabels.value[30] = '30秒';
+minuteLabels.value[59] = '1秒       ';
 // endregion
-
-const lineOptions = {
-    animation: false,
-    maintainAspectRatio: false, // 是否保持长宽比
-    plugins: {
-        legend: {
-            display: false
-        }
-    }
-};
-
-const cpuLineData = reactive({
-    labels: minuteLabels,
-    datasets: [
-        {
-            data: cpuUsageRatioLastMin,
-            fill: true,
-            borderColor: 'rgba(255,0,0,0.72)',
-            backgroundColor: 'rgba(255,0,0,0.36)',
-            borderWidth: 1,
-            pointRadius: 1,
-            tension: 0.1
-        }
-    ]
-});
-
-const memLineData = reactive({
-    labels: minuteLabels,
-    datasets: [
-        {
-            data: cpuUsageRatioLastMin,
-            fill: true,
-            borderColor: 'rgba(0,106,255,0.72)',
-            backgroundColor: 'rgba(0,106,255,0.36)',
-            borderWidth: 1,
-            pointRadius: 1,
-            tension: 0.1
-        }
-    ]
-});
 
 serverStore.fetchServerStaticInfo();
 serverStore.fetchInfoLast1Min().then(() => {
     serverStore.fetchRealtimeServerInfo();
+});
+
+const memUsageLastMinGB = ref(Array(60).fill(0));
+watchEffect(() => {
+    for (let i = 0; i < memUsageLastMin.value.length; i++) {
+        memUsageLastMinGB.value[i] = (memUsageLastMin.value[i] / 1024 / 1024 / 1024).toFixed(1);
+    }
 });
 </script>
 
 <template>
     <div class="grid p-fluid">
         <div class="col-12 xl:col-6">
-            <div class="card">
-                <h5>CPU</h5>
-                <div class="text-600 text-xs">使用率%</div>
-                <Chart type="line" :data="cpuLineData" :options="lineOptions" class="h-20rem" />
+            <OneMinLineChart
+                title="CPU"
+                :data="cpuUsageRatioLastMin"
+                border-color="rgba(255, 0, 0, 0.72)"
+                backgroundColor="rgba(255, 0, 0, 0.36)"
+                min="0"
+                max="100"
+                unit="使用率%"
+                max-unit="100%"
+            >
                 <div class="flex justify-content-between">
                     <!--实时数据-->
                     <div class="col-4 mr-3">
@@ -129,20 +102,26 @@ serverStore.fetchInfoLast1Min().then(() => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </OneMinLineChart>
         </div>
         <div class="col-12 xl:col-6">
-            <div class="card">
-                <h5>内存</h5>
-                <div class="text-600 text-xs">使用率%</div>
-                <Chart type="line" :data="memLineData" :options="lineOptions" class="h-20rem" />
+            <OneMinLineChart
+                title="内存"
+                :data="memUsageLastMinGB"
+                border-color="rgba(0, 106, 255, 0.72)"
+                backgroundColor="rgba(0, 106, 255, 0.36)"
+                unit="使用量"
+                :max-unit="autoTransferMemUnit(memStaticInfo.physicalTotalSize)"
+                :min="Number(0)"
+                :max="bToGb(memStaticInfo.physicalTotalSize)"
+            >
                 <div class="flex justify-content-between">
                     <!--实时数据-->
                     <div class="col-4 mr-3">
                         <div class="grid">
                             <div class="mt-2 mr-3">
                                 <div class="text-sm text-gray-700 -mb-1">当前</div>
-                                <div class="text-2xl">{{ memUsageRatioLastMin[59] }}%</div>
+                                <div class="text-2xl">{{ serverStore.memUsageRatioLastSec }}%</div>
                             </div>
                             <div class="mt-2 mr-3">
                                 <div class="text-sm text-gray-700 -mb-1">使用中</div>
@@ -172,7 +151,7 @@ serverStore.fetchInfoLast1Min().then(() => {
                         </div>
                     </div>
                 </div>
-            </div>
+            </OneMinLineChart>
         </div>
     </div>
 </template>
