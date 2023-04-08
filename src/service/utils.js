@@ -141,7 +141,7 @@ function pushAndPop(arr, val) {
 }
 
 /**
- * 将MB转换为GB, 保留两位小数, 小于1GB时返回原值
+ * 将B转换为MB或GB或不转换, 保留1位小数, 带单位
  * @returns {string}
  * @param bytes
  */
@@ -160,12 +160,27 @@ function autoTransferMemUnit(bytes) {
 }
 
 /**
- * 将字节转换为GB
- * @param b
- * @returns {string}
+ * 将B转换为MB或GB或不转换, 保留1位小数, 不带单位
+ * @param bytes
+ * @returns {Number}
  */
-function bToGb(b) {
-    return (b / 1024 / 1024 / 1024).toFixed(1);
+function autoTransferMem(bytes) {
+    if (bytes == 0) {
+        return 0;
+    }
+    const sizeInMegabytes = bytes / 1024 / 1024;
+    if (sizeInMegabytes < 1) {
+        return bytes;
+    }
+    if (sizeInMegabytes < 1024) {
+        return Number(sizeInMegabytes.toFixed(1));
+    }
+    return Number((sizeInMegabytes / 1024).toFixed(1));
+}
+
+function changeRgbaAlpha(color, alpha) {
+    const rgba = color.match(/(\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)/);
+    return rgba ? `rgba(${rgba[1]}, ${rgba[2]}, ${rgba[3]}, ${alpha})` : color;
 }
 
 export {
@@ -178,5 +193,6 @@ export {
     formatSeconds,
     pushAndPop,
     autoTransferMemUnit,
-    bToGb
+    autoTransferMem,
+    changeRgbaAlpha
 };

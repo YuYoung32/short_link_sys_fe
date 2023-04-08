@@ -1,14 +1,14 @@
 <script setup>
 /**
- * Created by YuYoung on 2023/4/7
- * Description: 1分钟实时数据线图
+ * Created by YuYoung on 2023/4/8
+ * Description: 1分钟实时数据线图, 有两个数据列, 暂时无法解决如何动态设置多个数据列的问题
  */
 import { defineProps, reactive, ref, toRefs, watchEffect } from 'vue';
 import { changeRgbaAlpha } from '@/service/utils';
 
-const props = defineProps(['title', 'unit', 'maxUnit', 'data', 'borderColor', 'min', 'max']);
+const props = defineProps(['title', 'unit', 'maxUnit', 'data1', 'borderColor1', 'data2', 'borderColor2', 'min', 'max']);
 
-const { title, unit, maxUnit, data, borderColor, min, max } = toRefs(props);
+const { title, unit, maxUnit, data1, data2, borderColor1, borderColor2, min, max } = toRefs(props);
 
 const minuteLabels = ref([]);
 for (let i = 0; i < 60; i++) {
@@ -18,10 +18,20 @@ const lineData = reactive({
     labels: minuteLabels,
     datasets: [
         {
-            data: data,
+            data: data1,
             fill: true,
-            borderColor: borderColor,
-            backgroundColor: changeRgbaAlpha(borderColor.value, 0.36),
+            borderColor: borderColor1,
+            backgroundColor: changeRgbaAlpha(borderColor1.value, 0.36),
+            borderWidth: 1,
+            pointRadius: 1,
+            tension: 0.1
+        },
+        {
+            data: data2,
+            fill: false,
+            borderDash: [5, 5],
+            borderColor: borderColor2,
+            backgroundColor: changeRgbaAlpha(borderColor2.value, 0.36),
             borderWidth: 1,
             pointRadius: 1,
             tension: 0.1
