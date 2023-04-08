@@ -96,7 +96,9 @@ const lineOptions = {
     },
     layout: {
         autoPadding: false,
-        padding: 0
+        padding: {
+            bottom: 2
+        }
     }
 };
 watchEffect(() => {

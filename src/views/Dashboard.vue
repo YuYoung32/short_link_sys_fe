@@ -21,6 +21,7 @@ const { isOnline, avgCPURatioLastMin, cpuUsageRatioLastMin } = storeToRefs(serve
 const { amountTotal } = storeToRefs(linkStore);
 const { visitAmountTotal } = storeToRefs(visitStore);
 
+serverStore.fetchInfoLast1Min();
 serverStore.fetchRealtimeServerInfo();
 linkStore.fetchLinksAmountTotal();
 </script>

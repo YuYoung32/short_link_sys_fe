@@ -41,11 +41,13 @@ serverStore.fetchInfoLast1Min().then(() => {
     serverStore.fetchRealtimeServerInfo();
 });
 
-const memUsageLastMinGB = ref(Array(60).fill(0));
+const memUsageLastMinGB = ref([]);
 watchEffect(() => {
+    const tmp = [];
     for (let i = 0; i < memUsageLastMin.value.length; i++) {
-        memUsageLastMinGB.value[i] = (memUsageLastMin.value[i] / 1024 / 1024 / 1024).toFixed(1);
+        tmp.push(memUsageLastMin.value[i] / 1024 / 1024 / 1024).toFixed(1);
     }
+    memUsageLastMinGB.value = tmp;
 });
 </script>
 
@@ -120,12 +122,12 @@ watchEffect(() => {
                     <div class="col-4 mr-3">
                         <div class="grid">
                             <div class="mt-2 mr-3">
-                                <div class="text-sm text-gray-700 -mb-1">当前</div>
-                                <div class="text-2xl">{{ serverStore.memUsageRatioLastSec }}%</div>
-                            </div>
-                            <div class="mt-2 mr-3">
                                 <div class="text-sm text-gray-700 -mb-1">使用中</div>
                                 <div class="text-2xl">{{ autoTransferMemUnit(memUsageLastSec) }}</div>
+                            </div>
+                            <div class="mt-2 mr-3">
+                                <div class="text-sm text-gray-700 -mb-1">使用百分比</div>
+                                <div class="text-2xl">{{ serverStore.memUsageRatioLastSec }}%</div>
                             </div>
                             <div class="mt-2">
                                 <div class="text-sm text-gray-700 -mb-1">可用</div>
