@@ -39,8 +39,8 @@ const state = () => {
             cacheSize: '-' //单位MB
         },
         memStaticInfo: {
-            physicalTotalSize: '-',
-            swapTotalSize: '-'
+            physicalTotalSize: 0,
+            swapTotalSize: 0
         },
         diskStaticInfo: {
             diskTotalSize: '-'
