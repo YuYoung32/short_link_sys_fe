@@ -28,6 +28,9 @@ const state = () => {
         diskUsageLastSec: 0,
         diskAvailLastSec: 0,
 
+        netRecvLastMin: [],
+        netSendLastMin: [],
+
         ttlLast48Hours: [],
 
         wsInvokeTimes: 0,
@@ -44,6 +47,10 @@ const state = () => {
         },
         diskStaticInfo: {
             diskTotalSize: '-'
+        },
+        netStaticInfo: {
+            ipv4: '-',
+            mac: '-'
         }
     };
 };
@@ -127,6 +134,9 @@ const actions = {
                 pushAndPop(objThis.diskWriteLastMin, info.diskWriteLastSec);
                 objThis.diskUsageLastSec = info.diskUsageLastSec;
                 objThis.diskAvailLastSec = info.diskAvailLastSec;
+
+                pushAndPop(objThis.netRecvLastMin, info.netRecvLastSec);
+                pushAndPop(objThis.netSendLastMin, info.netSendLastSec);
             });
 
             // 不允许server主动关闭连接
@@ -154,6 +164,8 @@ const actions = {
                     this.memUsageLastMin = response.data.memUsageLastMin;
                     this.diskReadLastMin = response.data.diskReadLastMin;
                     this.diskWriteLastMin = response.data.diskWriteLastMin;
+                    this.netRecvLastMin = response.data.netRecvLastMin;
+                    this.netSendLastMin = response.data.netSendLastMin;
                     return true;
                 } else {
                     throw response.data.msg;
