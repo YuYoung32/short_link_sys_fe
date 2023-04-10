@@ -4,7 +4,7 @@
  * Description: 1分钟实时数据线图, 有两个数据列, 暂时无法解决如何动态设置多个数据列的问题
  */
 import { defineProps, reactive, ref, toRefs, watchEffect } from 'vue';
-import { changeRgbaAlpha } from '@/service/utils';
+import { autoTransferMemUnit, changeRgbaAlpha } from '@/service/utils';
 
 const props = defineProps(['title', 'unit', 'maxUnit', 'data1', 'borderColor1', 'data2', 'borderColor2', 'min', 'max']);
 
@@ -46,6 +46,14 @@ const lineOptions = {
     plugins: {
         legend: {
             display: false
+        },
+        tooltip: {
+            callbacks: {
+                // 修改提示框中每个数据点的文本内容
+                label: function (context) {
+                    return autoTransferMemUnit(context.parsed.y);
+                }
+            }
         }
     },
     scales: {

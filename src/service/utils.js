@@ -141,7 +141,7 @@ function pushAndPop(arr, val) {
 }
 
 /**
- * 将B转换为MB或GB或不转换, 保留1位小数, 带单位
+ * 将B转换为KB或MB或GB或不转换, 保留1位小数, 带单位
  * @returns {string}
  * @param bytes
  */
@@ -149,18 +149,20 @@ function autoTransferMemUnit(bytes) {
     if (bytes == 0) {
         return '0';
     }
-    const sizeInMegabytes = bytes / 1024 / 1024;
-    if (sizeInMegabytes < 1) {
-        return bytes + 'B';
+    const sizeInKB = bytes / 1024;
+    if (sizeInKB < 1024) {
+        return sizeInKB.toFixed(1) + 'KB';
     }
-    if (sizeInMegabytes < 1024) {
-        return sizeInMegabytes.toFixed(1) + 'MB';
+    const sizeInMB = sizeInKB / 1024;
+    if (sizeInMB < 1024) {
+        return sizeInMB.toFixed(1) + 'MB';
     }
-    return (sizeInMegabytes / 1024).toFixed(1) + 'GB';
+    const sizeInGB = sizeInMB / 1024;
+    return sizeInGB.toFixed(1) + 'GB';
 }
 
 /**
- * 将B转换为MB或GB或不转换, 保留1位小数, 不带单位
+ * 将B转换为KB或MB或GB或不转换, 保留1位小数, 不带单位
  * @param bytes
  * @returns {Number}
  */
@@ -168,14 +170,16 @@ function autoTransferMem(bytes) {
     if (bytes == 0) {
         return 0;
     }
-    const sizeInMegabytes = bytes / 1024 / 1024;
-    if (sizeInMegabytes < 1) {
-        return bytes;
+    const sizeInKB = bytes / 1024;
+    if (sizeInKB < 1024) {
+        return Number(sizeInKB.toFixed(1));
     }
-    if (sizeInMegabytes < 1024) {
-        return Number(sizeInMegabytes.toFixed(1));
+    const sizeInMB = sizeInKB / 1024;
+    if (sizeInMB < 1024) {
+        return Number(sizeInMB.toFixed(1));
     }
-    return Number((sizeInMegabytes / 1024).toFixed(1));
+    const sizeInGB = sizeInMB / 1024;
+    return Number(sizeInGB.toFixed(1));
 }
 
 function changeRgbaAlpha(color, alpha) {

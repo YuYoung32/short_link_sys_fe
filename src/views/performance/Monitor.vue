@@ -4,7 +4,7 @@
  * Description: 性能监控
  */
 
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useServerStore } from '@/store/server';
 import { storeToRefs } from 'pinia/dist/pinia';
 import { autoTransferMemUnit, autoTransferMem, formatSeconds } from '@/service/utils';
@@ -53,31 +53,11 @@ const memUsageLastMinTransferUnit = computed(() => {
     }
     return tmp;
 });
-const diskReadLastMinTransferUnit = computed(() => {
-    const tmp = [];
-    for (let i = 0; i < diskReadLastMin.value.length; i++) {
-        tmp.push(autoTransferMem(diskReadLastMin.value[i]));
-    }
-    return tmp;
-});
-const diskWriteLastMinTransferUnit = computed(() => {
-    const tmp = [];
-    for (let i = 0; i < diskWriteLastMin.value.length; i++) {
-        tmp.push(autoTransferMem(diskWriteLastMin.value[i]));
-    }
-    return tmp;
-});
-const maxInDiskReadAndWrite = computed(() => {
-    let max = 0;
-    for (let i = 0; i < diskReadLastMin.value.length; i++) {
-        if (diskReadLastMin.value[i] > max) {
-            max = diskReadLastMin.value[i];
-        }
-        if (diskWriteLastMin.value[i] > max) {
-            max = diskWriteLastMin.value[i];
-        }
-    }
-    return autoTransferMemUnit(max);
+const diskMaxUnit = ref('');
+watch([diskWriteLastMin, diskReadLastMin], (val) => {
+    let _diskMax = Math.max(...val[0]);
+    _diskMax = Math.max(_diskMax, ...val[1]);
+    diskMaxUnit.value = autoTransferMemUnit(_diskMax);
 });
 </script>
 
@@ -186,12 +166,12 @@ const maxInDiskReadAndWrite = computed(() => {
         <div class="col-12 xl:col-6">
             <OneMin2LineChart
                 title="磁盘"
-                :data1="diskReadLastMinTransferUnit"
+                :data1="diskReadLastMin"
                 border-color1="rgba(0, 181, 181, 0.72)"
-                :data2="diskWriteLastMinTransferUnit"
+                :data2="diskWriteLastMin"
                 border-color2="rgba(0, 181, 181, 0.72)"
                 unit="吞吐量"
-                :max-unit="maxInDiskReadAndWrite"
+                :max-unit="diskMaxUnit"
             >
                 <div class="flex justify-content-between">
                     <!--实时数据-->
