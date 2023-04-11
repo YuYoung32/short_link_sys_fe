@@ -9,6 +9,7 @@ import CPU1MinLineChart from '@/components/Monitor/CPU1MinLineChart.vue';
 import Mem1MinLineChart from '@/components/Monitor/Mem1MinLineChart.vue';
 import Disk1MinLineChart from '@/components/Monitor/Disk1MinLineChart.vue';
 import Net1MinLineChart from '@/components/Monitor/Net1MinLineChart.vue';
+import Overview from '@/components/Monitor/Overview.vue';
 
 const serverStore = useServerStore();
 
@@ -20,6 +21,7 @@ serverStore.fetchInfoLast1Min().then(() => {
 
 <template>
     <div class="grid">
+        <Overview></Overview>
         <CPU1MinLineChart></CPU1MinLineChart>
         <Mem1MinLineChart></Mem1MinLineChart>
         <Disk1MinLineChart></Disk1MinLineChart>

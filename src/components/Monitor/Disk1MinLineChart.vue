@@ -11,6 +11,7 @@ import MonitorDataCard from '@/components/Monitor/MonitorDataCard.vue';
 import TitleDataDivVertical from '@/components/Monitor/TitleDataDivVertical.vue';
 import TitleDataDivHorizon from '@/components/Monitor/TitleDataDivHorizon.vue';
 import { autoTransferMemUnit } from '@/service/utils';
+import { color } from '@/components/Monitor/color';
 import { RealTimeLineChartData, RealTimeLineChartOption } from '@/service/graphConfig';
 
 const serverStore = useServerStore();
@@ -25,9 +26,9 @@ watch([diskWriteLastMin, diskReadLastMin], (val) => {
 });
 
 const data = reactive(new RealTimeLineChartData());
-data.setData(diskReadLastMin, 'rgba(0, 181, 181, 0.72)');
-data.setData(diskWriteLastMin, 'rgba(0, 181, 181, 0.72)');
-data.datasets[1].backgroundColor = 'rgba(0, 0, 0, 0)';
+data.setData(diskReadLastMin, color.disk);
+data.setData(diskWriteLastMin, color.disk);
+data.datasets[1].backgroundColor = color.transparent;
 data.datasets[1].borderDash = [5, 5];
 
 const options = new RealTimeLineChartOption();
@@ -59,14 +60,14 @@ options.plugins.tooltip = {
                 <div class="flex flex-wrap">
                     <TitleDataDivVertical
                         class="pr-5 pl-1 mt-2"
-                        style="border-left: 0.25rem solid rgba(0, 181, 181, 0.72)"
+                        :style="'border-left: 0.25rem solid ' + color.disk"
                         title="读取速度"
                         :data="autoTransferMemUnit(diskReadLastMin[59]) + '/S'"
                     />
                     <TitleDataDivVertical
                         class="pr-3 pl-1 mt-2"
                         title="写入速度"
-                        style="border-left: 0.25rem dashed rgba(0, 181, 181, 0.72)"
+                        :style="'border-left: 0.25rem dashed ' + color.disk"
                         :data="autoTransferMemUnit(diskWriteLastMin[59]) + '/S'"
                     />
                 </div>

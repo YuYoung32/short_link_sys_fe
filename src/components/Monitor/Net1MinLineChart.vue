@@ -12,14 +12,15 @@ import MonitorDataCard from '@/components/Monitor/MonitorDataCard.vue';
 import { useServerStore } from '@/store/server';
 import { RealTimeLineChartData, RealTimeLineChartOption } from '@/service/graphConfig';
 import { storeToRefs } from 'pinia/dist/pinia';
+import { color } from '@/components/Monitor/color';
 
 const serverStore = useServerStore();
 const { netRecvLastMin, netSendLastMin, netStaticInfo } = storeToRefs(serverStore);
 
 const data = reactive(new RealTimeLineChartData());
-data.setData(netSendLastMin, 'rgba(163,0,181,0.71)');
-data.setData(netRecvLastMin, 'rgba(163,0,181,0.71)');
-data.datasets[1].backgroundColor = 'rgba(0, 0, 0, 0)';
+data.setData(netSendLastMin, color.net);
+data.setData(netRecvLastMin, color.net);
+data.datasets[1].backgroundColor = color.transparent;
 data.datasets[1].borderDash = [5, 5];
 const options = new RealTimeLineChartOption();
 options.plugins.tooltip = {
@@ -57,14 +58,14 @@ watch([netRecvLastMin, netSendLastMin], (val) => {
                 <div class="flex flex-wrap">
                     <TitleDataDivVertical
                         class="pr-5 pl-1 mt-2"
-                        style="border-left: 0.25rem solid rgba(163, 0, 181, 0.71)"
+                        :style="'border-left: 0.25rem solid ' + color.net"
                         title="接收速度"
                         :data="autoTransferMemUnit(netRecvLastMin[59]) + '/S'"
                     />
                     <TitleDataDivVertical
                         class="pr-3 pl-1 mt-2"
                         title="发送速度"
-                        style="border-left: 0.25rem dashed rgba(163, 0, 181, 0.71)"
+                        :style="'border-left: 0.25rem dashed ' + color.net"
                         :data="autoTransferMemUnit(netSendLastMin[59]) + '/S'"
                     />
                 </div>

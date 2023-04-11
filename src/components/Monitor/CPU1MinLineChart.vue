@@ -10,6 +10,7 @@ import { reactive } from 'vue';
 import { storeToRefs } from 'pinia/dist/pinia';
 import MonitorDataCard from '@/components/Monitor/MonitorDataCard.vue';
 import { formatSeconds } from '@/service/utils';
+import { color } from '@/components/Monitor/color';
 import TitleDataDivVertical from '@/components/Monitor/TitleDataDivVertical.vue';
 import TitleDataDivHorizon from '@/components/Monitor/TitleDataDivHorizon.vue';
 
@@ -17,7 +18,7 @@ const serverStore = useServerStore();
 const { cpuUsageRatioLastMin, cpuStaticInfo, cpuRunningTime, cpuFreqLastSec } = storeToRefs(serverStore);
 
 const data = reactive(new RealTimeLineChartData());
-data.setData(cpuUsageRatioLastMin, 'rgba(255, 0, 0, 0.72)');
+data.setData(cpuUsageRatioLastMin, color.cpu);
 const options = new RealTimeLineChartOption();
 </script>
 

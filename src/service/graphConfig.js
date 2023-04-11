@@ -2,7 +2,8 @@
  * Created by YuYoung on 2023/4/10
  * Description: 无坐标, 无边框的折线图, 图线和数据选项
  */
-import { changeRgbaAlpha } from '@/service/utils';
+
+import { changeRgbaAlpha } from '@/components/Monitor/color';
 
 class RealTimeLineChartData {
     constructor() {

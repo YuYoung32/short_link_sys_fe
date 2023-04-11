@@ -182,11 +182,6 @@ function autoTransferMem(bytes) {
     return Number(sizeInGB.toFixed(1));
 }
 
-function changeRgbaAlpha(color, alpha) {
-    const rgba = color.match(/(\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)/);
-    return rgba ? `rgba(${rgba[1]}, ${rgba[2]}, ${rgba[3]}, ${alpha})` : color;
-}
-
 export {
     dateObjToDayBeginUnixTime,
     dateObjToDayEndUnixTime,
@@ -197,6 +192,5 @@ export {
     formatSeconds,
     pushAndPop,
     autoTransferMemUnit,
-    autoTransferMem,
-    changeRgbaAlpha
+    autoTransferMem
 };

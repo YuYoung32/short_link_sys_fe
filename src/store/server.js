@@ -11,8 +11,6 @@ const state = () => {
     return {
         isOnline: false,
 
-        ttlLastXHour: [],
-
         cpuUsageRatioLastSec: 0,
         cpuUsageRatioLastMin: [], // 首次获取后, 以后从cpuUsageRatioLastSec叠加
         cpuFreqLastSec: '-', // 单位MHz
@@ -31,7 +29,7 @@ const state = () => {
         netRecvLastMin: [],
         netSendLastMin: [],
 
-        ttlLast48Hours: [],
+        ttlLastSec: 0, // 单位ms
 
         wsInvokeTimes: 0,
 
@@ -60,7 +58,7 @@ const getters = {
         return (state.cpuUsageRatioLastMin.reduce((a, b) => a + b, 0) / state.cpuUsageRatioLastMin.length).toFixed(2);
     },
     memUsageRatioLastSec: (state) => {
-        return ((state.memUsageLastSec / state.memStaticInfo.physicalTotalSize) * 100).toFixed(0);
+        return Number(((state.memUsageLastSec / state.memStaticInfo.physicalTotalSize) * 100).toFixed(0));
     },
     diskUsageRatioLastSec: (state) => {
         return ((state.diskUsageLastSec / state.diskStaticInfo.diskTotalSize) * 100).toFixed(0);
@@ -137,6 +135,8 @@ const actions = {
 
                 pushAndPop(objThis.netRecvLastMin, info.netRecvLastSec);
                 pushAndPop(objThis.netSendLastMin, info.netSendLastSec);
+
+                objThis.ttlLastSec = info.ttlLastSec;
             });
 
             // 不允许server主动关闭连接

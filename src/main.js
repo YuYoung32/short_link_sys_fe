@@ -31,6 +31,7 @@ import Fieldset from 'primevue/fieldset';
 import Calendar from 'primevue/calendar';
 import Chips from 'primevue/chips';
 import AutoComplete from 'primevue/autocomplete';
+import Knob from 'primevue/knob';
 
 // import localization from "/src/localization";
 import '@/assets/styles.scss';
@@ -99,6 +100,7 @@ app.component('Fieldset', Fieldset);
 app.component('Calendar', Calendar);
 app.component('Chips', Chips);
 app.component('AutoComplete', AutoComplete);
+app.component('Knob', Knob);
 
 app.use(createPinia());
 app.use(router);

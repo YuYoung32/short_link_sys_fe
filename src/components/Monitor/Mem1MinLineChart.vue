@@ -12,6 +12,7 @@ import TitleDataDivHorizon from '@/components/Monitor/TitleDataDivHorizon.vue';
 import TitleDataDivVertical from '@/components/Monitor/TitleDataDivVertical.vue';
 import MonitorDataCard from '@/components/Monitor/MonitorDataCard.vue';
 import { autoTransferMemUnit } from '@/service/utils';
+import { color } from '@/components/Monitor/color';
 
 const serverStore = useServerStore();
 const { memUsageLastMin, memAvailLastSec, swapUsageLastSec, memStaticInfo, memUsageLastSec } = storeToRefs(serverStore);
@@ -19,7 +20,7 @@ const { memUsageLastMin, memAvailLastSec, swapUsageLastSec, memStaticInfo, memUs
 serverStore.fetchServerStaticInfo();
 
 const data = reactive(new RealTimeLineChartData());
-data.setData(memUsageLastMin, 'rgba(0, 106, 255, 0.72)');
+data.setData(memUsageLastMin, color.mem);
 
 const options = new RealTimeLineChartOption();
 watch(memStaticInfo, (newVal) => {

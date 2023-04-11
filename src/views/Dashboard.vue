@@ -14,6 +14,7 @@ import { dateObjToDayBeginUnixTime, dateObjToDayEndUnixTime } from '@/service/ut
 import MonitorDataCard from '@/components/Monitor/MonitorDataCard.vue';
 import { reactive } from 'vue';
 import { RealTimeLineChartData, RealTimeLineChartOption } from '@/service/graphConfig';
+import { color } from '@/components/Monitor/color';
 
 const serverStore = useServerStore();
 const linkStore = useLinkStore();
@@ -24,7 +25,7 @@ const { amountTotal } = storeToRefs(linkStore);
 const { visitAmountTotal } = storeToRefs(visitStore);
 
 const cpuLineData = reactive(new RealTimeLineChartData());
-cpuLineData.setData(cpuUsageRatioLastMin, 'rgba(255, 0, 0, 0.72)');
+cpuLineData.setData(cpuUsageRatioLastMin, color.cpu);
 const cpuLineOption = new RealTimeLineChartOption();
 
 serverStore.fetchInfoLast1Min();
