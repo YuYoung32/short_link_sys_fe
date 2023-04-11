@@ -74,6 +74,7 @@ const actions = {
                     this.cpuStaticInfo = response.data.cpuStaticInfo;
                     this.memStaticInfo = response.data.memStaticInfo;
                     this.diskStaticInfo = response.data.diskStaticInfo;
+                    this.netStaticInfo = response.data.netStaticInfo;
                     return true;
                 } else {
                     throw response.data.msg;
