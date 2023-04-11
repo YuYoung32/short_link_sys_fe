@@ -19,7 +19,7 @@
                 <span>30秒</span>
                 <span>0</span>
             </div>
-            <div class="flex justify-content-between">
+            <div class="flex justify-content-between h-auto xl:h-10rem">
                 <!--实时数据, 插入-->
                 <slot name="real-time-info" />
                 <!--静态数据, 插入-->
