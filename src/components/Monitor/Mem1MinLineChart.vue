@@ -17,8 +17,6 @@ import { color } from '@/components/Monitor/color';
 const serverStore = useServerStore();
 const { memUsageLastMin, memAvailLastSec, swapUsageLastSec, memStaticInfo, memUsageLastSec } = storeToRefs(serverStore);
 
-serverStore.fetchServerStaticInfo();
-
 const data = reactive(new RealTimeLineChartData());
 data.setData(memUsageLastMin, color.mem);
 
