@@ -15,7 +15,7 @@ import TitleDataDivVertical from '@/components/Monitor/TitleDataDivVertical.vue'
 import TitleDataDivHorizon from '@/components/Monitor/TitleDataDivHorizon.vue';
 
 const serverStore = useServerStore();
-const { cpuUsageRatioLastMin, cpuStaticInfo, cpuRunningTime, cpuFreqLastSec } = storeToRefs(serverStore);
+const { cpuUsageRatioLastMin, cpuStaticInfo, cpuRunningTime } = storeToRefs(serverStore);
 
 const data = reactive(new RealTimeLineChartData());
 data.setData(cpuUsageRatioLastMin, color.cpu);
@@ -40,11 +40,6 @@ const options = new RealTimeLineChartOption();
             <div class="flex flex-column">
                 <div class="flex flex-wrap">
                     <TitleDataDivVertical class="pr-3 pt-2" title="当前" :data="cpuUsageRatioLastMin[59] + '%'" />
-                    <TitleDataDivVertical
-                        class="pr-3 pt-2"
-                        title="速度"
-                        :data="(cpuFreqLastSec / 1000).toFixed(2) + 'GHz'"
-                    />
                 </div>
                 <div class="flex flex-wrap">
                     <TitleDataDivVertical

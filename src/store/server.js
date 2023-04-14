@@ -13,7 +13,6 @@ const state = () => {
 
         cpuUsageRatioLastSec: 0,
         cpuUsageRatioLastMin: [], // 首次获取后, 以后从cpuUsageRatioLastSec叠加
-        cpuFreqLastSec: '-', // 单位MHz
         cpuRunningTime: 0, // 单位秒
 
         memUsageLastMin: [], // 首次获取后, 后续根据秒数据叠加
@@ -121,8 +120,7 @@ const actions = {
 
                 objThis.cpuUsageRatioLastSec = info.cpuUsageRatioLastSec;
                 pushAndPop(objThis.cpuUsageRatioLastMin, info.cpuUsageRatioLastSec);
-                objThis.cpuFreqLastSec = info.cpuFreqLastSec;
-                objThis.cpuRunningTime = info.runningTime;
+                objThis.cpuRunningTime = info.cpuRunningTime;
 
                 pushAndPop(objThis.memUsageLastMin, info.memUsageLastSec);
                 objThis.memUsageLastSec = info.memUsageLastSec;
@@ -137,7 +135,7 @@ const actions = {
                 pushAndPop(objThis.netRecvLastMin, info.netRecvLastSec);
                 pushAndPop(objThis.netSendLastMin, info.netSendLastSec);
 
-                objThis.ttlLastSec = info.ttlLastSec;
+                // objThis.ttlLastSec = info.ttlLastSec;
             });
 
             // 不允许server主动关闭连接
