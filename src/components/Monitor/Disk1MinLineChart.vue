@@ -4,7 +4,7 @@
  * Description: 磁盘1分钟实时数据线图
  */
 
-import { reactive, ref, watch } from 'vue';
+import { reactive } from 'vue';
 import { useServerStore } from '@/store/server';
 import { storeToRefs } from 'pinia/dist/pinia';
 import MonitorDataCard from '@/components/Monitor/MonitorDataCard.vue';
@@ -17,13 +17,6 @@ import { RealTimeLineChartData, RealTimeLineChartOption } from '@/service/graphC
 const serverStore = useServerStore();
 const { diskStaticInfo, diskReadLastMin, diskWriteLastMin, diskUsageLastSec, diskAvailLastSec } =
     storeToRefs(serverStore);
-
-const diskMaxUnit = ref('');
-watch([diskWriteLastMin, diskReadLastMin], (val) => {
-    let _diskMax = Math.max(...val[0]);
-    _diskMax = Math.max(_diskMax, ...val[1]);
-    diskMaxUnit.value = autoTransferMemUnit(_diskMax);
-});
 
 const data = reactive(new RealTimeLineChartData());
 data.setData(diskReadLastMin, color.disk);
@@ -49,7 +42,11 @@ options.plugins.tooltip = {
         <template #unit-and-max>
             <div class="flex justify-content-between text-gray-600 text-xs">
                 <span>吞吐量</span>
-                <span>{{ diskMaxUnit }}</span>
+                <span
+                    >{{
+                        autoTransferMemUnit(Math.max(Math.max(...diskWriteLastMin), Math.max(...diskReadLastMin)))
+                    }}/S</span
+                >
             </div>
         </template>
         <template #chart>
