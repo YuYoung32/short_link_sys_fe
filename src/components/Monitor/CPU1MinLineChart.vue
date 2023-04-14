@@ -55,7 +55,11 @@ const options = new RealTimeLineChartOption();
                 <TitleDataDivHorizon title="型号：" :data="cpuStaticInfo.name" />
                 <TitleDataDivHorizon class="pt-1" title="核心数：" :data="cpuStaticInfo.coreNum" />
                 <TitleDataDivHorizon class="pt-1" title="线程数：" :data="cpuStaticInfo.threadNum" />
-                <TitleDataDivHorizon class="pt-1" title="缓存：" :data="cpuStaticInfo.cacheSize + 'MB'" />
+                <TitleDataDivHorizon
+                    class="pt-1"
+                    title="缓存："
+                    :data="(cpuStaticInfo.cacheSize / 1024).toFixed(1) + 'MB'"
+                />
             </div>
         </template>
     </MonitorDataCard>
