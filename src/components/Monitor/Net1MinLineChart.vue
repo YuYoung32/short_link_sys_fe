@@ -4,7 +4,7 @@
  * Description: 网络1分钟实时数据线图
  */
 
-import { reactive, ref, watch } from 'vue';
+import { reactive } from 'vue';
 import { autoTransferMemUnit } from '@/service/utils';
 import TitleDataDivVertical from '@/components/Monitor/TitleDataDivVertical.vue';
 import TitleDataDivHorizon from '@/components/Monitor/TitleDataDivHorizon.vue';
@@ -30,13 +30,6 @@ options.plugins.tooltip = {
         }
     }
 };
-
-const netMaxUnit = ref('');
-watch([netRecvLastMin, netSendLastMin], (val) => {
-    let _netMaxUnit = Math.max(...val[0]);
-    _netMaxUnit = Math.max(_netMaxUnit, ...val[1]);
-    netMaxUnit.value = autoTransferMemUnit(_netMaxUnit);
-});
 </script>
 
 <template>
@@ -47,7 +40,11 @@ watch([netRecvLastMin, netSendLastMin], (val) => {
         <template #unit-and-max>
             <div class="flex justify-content-between text-gray-600 text-xs">
                 <span>吞吐量</span>
-                <span>{{ netMaxUnit }}</span>
+                <span
+                    >{{
+                        autoTransferMemUnit(Math.max(Math.max(...netSendLastMin), Math.max(...netRecvLastMin)))
+                    }}/S</span
+                >
             </div>
         </template>
         <template #chart>
