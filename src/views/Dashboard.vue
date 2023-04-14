@@ -27,6 +27,8 @@ const { visitAmountTotal } = storeToRefs(visitStore);
 const cpuLineData = reactive(new RealTimeLineChartData());
 cpuLineData.setData(cpuUsageRatioLastMin, color.cpu);
 const cpuLineOption = new RealTimeLineChartOption();
+cpuLineOption.scales.y.min = 0;
+cpuLineOption.scales.y.max = 100;
 
 serverStore.fetchInfoLast1Min();
 serverStore.fetchRealtimeServerInfo();

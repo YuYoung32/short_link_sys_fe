@@ -20,6 +20,8 @@ const { cpuUsageRatioLastMin, cpuStaticInfo, cpuRunningTime } = storeToRefs(serv
 const data = reactive(new RealTimeLineChartData());
 data.setData(cpuUsageRatioLastMin, color.cpu);
 const options = new RealTimeLineChartOption();
+options.scales.y.min = 0;
+options.scales.y.max = 100;
 </script>
 
 <template>
