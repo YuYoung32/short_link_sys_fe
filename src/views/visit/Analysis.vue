@@ -119,26 +119,66 @@ const provinceToColor = {
     海外: '#ffa07a',
     未知: '#556b2f'
 };
-const pieColors = ref([]);
+function extractProvince(country) {
+    let province;
+    if (country.includes('省')) {
+        province = country.split('省')[0];
+    } else if (country.includes('市')) {
+        province = country.split('市')[0];
+    } else if (country.includes('自治区')) {
+        province = country.split('自治区')[0];
+    } else if (country.includes('自治州')) {
+        province = country.split('自治州')[0];
+    } else if (country.includes('特别行政区')) {
+        province = country.split('特别行政区')[0];
+    } else if (country.includes('区')) {
+        province = country.split('区')[0];
+    } else if (country.includes('县')) {
+        province = country.split('县')[0];
+    } else if (country.includes('国')) {
+        province = '海外';
+    } else {
+        province = '未知';
+    }
+    return province;
+}
+const visitIPRegionColors = ref([]);
+// 以下两个变量是为了把xx省xx市归纳为为xx省
+const visitIPRegionWithProvince = ref([]);
+const visitIPAmountWithProvince = ref([]);
 watch(
-    () => visitIPRegion.value,
+    [visitIPRegion, visitIPRegionAmount],
     (val) => {
-        pieColors.value = [];
-        for (let i = 0; i < val.length; i++) {
+        visitIPRegionColors.value = [];
+        visitIPRegionWithProvince.value = [];
+        if (!val[0] || val[0].length <= 0) {
+            return;
+        }
+        for (let i = 0; i < val[0].length; i++) {
+            const province = extractProvince(val[0][i]);
+            const idx = visitIPRegionWithProvince.value.indexOf(province);
+            if (idx !== -1) {
+                // 同一个省份的IP数量累加
+                visitIPAmountWithProvince.value[idx] += val[1][i];
+            } else {
+                visitIPRegionWithProvince.value.push(province);
+                visitIPAmountWithProvince.value.push(val[1][i]);
+            }
             try {
-                pieColors.value.push(provinceToColor[val[i]]);
+                visitIPRegionColors.value.push(provinceToColor[province]);
             } catch (e) {
-                pieColors.value.push('#556b2f');
+                visitIPRegionColors.value.push('#556b2f');
             }
         }
-    }
+    },
+    { deep: true }
 );
 const pieData = ref({
-    labels: visitIPRegion,
+    labels: visitIPRegionWithProvince,
     datasets: [
         {
-            data: visitIPRegionAmount,
-            backgroundColor: pieColors
+            data: visitIPAmountWithProvince,
+            backgroundColor: visitIPRegionColors
         }
     ]
 });
@@ -367,12 +407,12 @@ visitStore.fetchVisitIPRegion(
             <div class="card">
                 <h5>访问IP来源</h5>
                 <h3
-                    v-if="visitIPAmount.length <= 0"
+                    v-if="!(visitIPRegion && visitIPRegion.length > 0)"
                     class="flex align-items-center justify-content-center text-500 my-6"
                 >
                     无数据
                 </h3>
-                <div v-if="visitIPAmount.length > 0">
+                <div v-if="visitIPRegion && visitIPRegion.length > 0">
                     <Chart type="pie" :data="pieData" :options="pieOptions" style="min-height: 20rem" />
                 </div>
             </div>
