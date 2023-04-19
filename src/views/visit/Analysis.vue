@@ -163,11 +163,11 @@ watch(
             } else {
                 visitIPRegionWithProvince.value.push(province);
                 visitIPAmountWithProvince.value.push(val[1][i]);
-            }
-            try {
-                visitIPRegionColors.value.push(provinceToColor[province]);
-            } catch (e) {
-                visitIPRegionColors.value.push('#556b2f');
+                try {
+                    visitIPRegionColors.value.push(provinceToColor[province]);
+                } catch (e) {
+                    visitIPRegionColors.value.push('#556b2f');
+                }
             }
         }
     },
@@ -192,6 +192,7 @@ const pieOptions = ref({
         }
     }
 });
+visitStore.fetchVisitIPRegion();
 //endregion
 
 function confirmFilter() {
