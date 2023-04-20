@@ -63,7 +63,7 @@ const lineData = ref({
             borderWidth: 2,
             pointRadius: 2,
             borderColor: '#6366f1',
-            tension: 0.1
+            tension: 0.3
         },
         {
             label: '访问IP数量',
@@ -72,13 +72,42 @@ const lineData = ref({
             pointRadius: 2,
             backgroundColor: '#8a2be2',
             borderColor: '#8a2be2',
-            tension: 0.1
+            tension: 0.3
         }
     ]
 });
 const lineOptions = ref({
     animation: true,
-    maintainAspectRatio: false // 是否保持长宽比
+    maintainAspectRatio: false, // 是否保持长宽比
+    scales: {
+        y: {
+            position: 'left',
+            ticks: {
+                stepSize: 1
+            },
+            min: 0,
+            max: () => {
+                const max = Math.max(Math.max(...visitAmount.value), Math.max(...visitIPAmount.value));
+                if (max < 10) {
+                    return max;
+                }
+                return max + 10;
+            }
+        },
+        x2: {
+            position: 'top',
+            grid: {
+                display: false,
+                drawTicks: false
+            },
+            ticks: {
+                display: false
+            },
+            border: {
+                display: true
+            }
+        }
+    }
 });
 //endregion
 
@@ -179,8 +208,7 @@ function confirmFilter() {
 }
 
 function clearAllFilter() {
-    console.log('clear');
-    dateKeywords.value = [lastWeek, lastDay];
+    dateKeywords.value = [lastWeek(), lastDay()];
     linkBySLKeyword.value = '';
 }
 
@@ -210,7 +238,7 @@ visitStore.fetchVisitIPRegion(
                 <div class="flex justify-content-center align-content-center flex-column md:flex-row">
                     <!--时间-->
                     <div class="pt-2 mr-4 w-full md:w-6">
-                        <Card style="min-height: 20rem">
+                        <Card style="min-height: 21rem">
                             <template v-slot:title>
                                 <h5 class="font-medium">时间（必选）</h5>
                             </template>
@@ -288,7 +316,7 @@ visitStore.fetchVisitIPRegion(
                     </div>
                     <!--短链-->
                     <div class="pt-4 md:pt-2 w-full md:w-6">
-                        <Card style="min-height: 20rem">
+                        <Card style="min-height: 21rem">
                             <template v-slot:title>
                                 <h5 class="font-medium">短链</h5>
                             </template>

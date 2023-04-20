@@ -189,7 +189,7 @@ function extractProvince(country) {
     } else if (country.includes('市')) {
         province = country.split('市')[0];
     } else if (country.includes('自治区')) {
-        province = country.split('自治区')[0];
+        province = country.substr(0, 2);
     } else if (country.includes('自治州')) {
         province = country.split('自治州')[0];
     } else if (country.includes('特别行政区')) {
