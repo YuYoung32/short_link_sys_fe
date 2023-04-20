@@ -21,14 +21,14 @@ const { visitAmount, visitIPAmount, visitIPRegionAndAMountWithProvince } = store
 
 //region 筛选
 // region 筛选日期
-const lastDay = new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
-const lastWeek = new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
-const last15Days = new Date(new Date().getTime() - 15 * 24 * 60 * 60 * 1000);
-const last30Days = new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000);
+const lastDay = () => new Date(new Date().getTime() - 24 * 60 * 60 * 1000);
+const lastWeek = () => new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000);
+const last15Days = () => new Date(new Date().getTime() - 15 * 24 * 60 * 60 * 1000);
+const last30Days = () => new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000);
 
-const dateKeywords = ref([Date(), Date()]);
-dateKeywords.value[0] = lastDay;
-dateKeywords.value[1] = lastDay;
+const dateKeywords = ref([new Date(), new Date()]);
+dateKeywords.value[0] = lastWeek();
+dateKeywords.value[1] = lastDay();
 
 const showCalendar = ref(true);
 function refreshCalendar() {
@@ -163,7 +163,6 @@ const pieOptions = ref({
         }
     }
 });
-visitStore.fetchVisitIPRegion();
 //endregion
 
 function confirmFilter() {
@@ -180,6 +179,7 @@ function confirmFilter() {
 }
 
 function clearAllFilter() {
+    console.log('clear');
     dateKeywords.value = [lastWeek, lastDay];
     linkBySLKeyword.value = '';
 }
@@ -233,7 +233,11 @@ visitStore.fetchVisitIPRegion(
                                                 <Button
                                                     label="还原"
                                                     severity="danger"
-                                                    @click="dateKeywords = [lastWeek, lastDay]"
+                                                    @click="
+                                                        dateKeywords[0] = lastWeek();
+                                                        dateKeywords[1] = lastDay();
+                                                        refreshCalendar();
+                                                    "
                                                 ></Button>
                                             </div>
                                         </template>
@@ -243,8 +247,8 @@ visitStore.fetchVisitIPRegion(
                                             label="过去1天（24小时）"
                                             class="my-2"
                                             @click="
-                                                dateKeywords[0] = lastDay;
-                                                dateKeywords[1] = lastDay;
+                                                dateKeywords[0] = lastDay();
+                                                dateKeywords[1] = lastDay();
                                                 refreshCalendar();
                                             "
                                         ></Button>
@@ -253,8 +257,8 @@ visitStore.fetchVisitIPRegion(
                                                 label="过去7天（默认）"
                                                 class="mr-2"
                                                 @click="
-                                                    dateKeywords[0] = lastWeek;
-                                                    dateKeywords[1] = lastDay;
+                                                    dateKeywords[0] = lastWeek();
+                                                    dateKeywords[1] = lastDay();
                                                     refreshCalendar();
                                                 "
                                             ></Button>
@@ -262,8 +266,8 @@ visitStore.fetchVisitIPRegion(
                                                 label="过去15天"
                                                 class="mr-2"
                                                 @click="
-                                                    dateKeywords[0] = last15Days;
-                                                    dateKeywords[1] = lastDay;
+                                                    dateKeywords[0] = last15Days();
+                                                    dateKeywords[1] = lastDay();
                                                     refreshCalendar();
                                                 "
                                             ></Button>
@@ -271,8 +275,8 @@ visitStore.fetchVisitIPRegion(
                                                 label="过去30天"
                                                 class=""
                                                 @click="
-                                                    dateKeywords[0] = last30Days;
-                                                    dateKeywords[1] = lastDay;
+                                                    dateKeywords[0] = last30Days();
+                                                    dateKeywords[1] = lastDay();
                                                     refreshCalendar();
                                                 "
                                             ></Button>
