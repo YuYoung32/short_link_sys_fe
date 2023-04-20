@@ -182,6 +182,30 @@ function autoTransferMem(bytes) {
     return Number(sizeInGB.toFixed(1));
 }
 
+function extractProvince(country) {
+    let province;
+    if (country.includes('省')) {
+        province = country.split('省')[0];
+    } else if (country.includes('市')) {
+        province = country.split('市')[0];
+    } else if (country.includes('自治区')) {
+        province = country.split('自治区')[0];
+    } else if (country.includes('自治州')) {
+        province = country.split('自治州')[0];
+    } else if (country.includes('特别行政区')) {
+        province = country.split('特别行政区')[0];
+    } else if (country.includes('区')) {
+        province = country.split('区')[0];
+    } else if (country.includes('县')) {
+        province = country.split('县')[0];
+    } else if (country.includes('国')) {
+        province = '海外';
+    } else {
+        province = '未知';
+    }
+    return province;
+}
+
 export {
     dateObjToDayBeginUnixTime,
     dateObjToDayEndUnixTime,
@@ -192,5 +216,6 @@ export {
     formatSeconds,
     pushAndPop,
     autoTransferMemUnit,
-    autoTransferMem
+    autoTransferMem,
+    extractProvince
 };

@@ -5,7 +5,7 @@
 
 import { defineStore } from 'pinia';
 import axios from '@/service/net';
-import { unixTimeToString } from '@/service/utils';
+import { extractProvince, unixTimeToString } from '@/service/utils';
 
 const state = () => {
     return {
@@ -46,6 +46,25 @@ const getters = {
             state._visitDetails[i].visitTime = unixTimeToString(state._visitDetails[i].visitTime);
         }
         return state._visitDetails;
+    },
+    // 把xx省xx市归纳为为xx省
+    visitIPRegionAndAMountWithProvince: (state) => {
+        let province = [];
+        let provinceAmount = [];
+        if (!state.visitIPRegion || state.visitIPRegion.length === 0) {
+            return [province, provinceAmount];
+        }
+        for (let i = 0; i < state.visitIPRegion.length; i++) {
+            let provinceName = extractProvince(state.visitIPRegion[i]);
+            let idx = province.indexOf(provinceName);
+            if (idx !== -1) {
+                provinceAmount[idx] += state.visitIPRegionAmount[i];
+            } else {
+                province.push(provinceName);
+                provinceAmount.push(state.visitIPRegionAmount[i]);
+            }
+        }
+        return [province, provinceAmount];
     }
 };
 
