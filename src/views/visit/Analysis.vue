@@ -207,9 +207,9 @@ visitStore.fetchVisitIPRegion(
         <div class="col-12">
             <div class="card">
                 <h4>筛选</h4>
-                <div class="grid justify-content-center align-content-center">
+                <div class="flex justify-content-center align-content-center flex-column md:flex-row">
                     <!--时间-->
-                    <div class="mt-2 sm:col-12 md:col-6">
+                    <div class="pt-2 mr-4 w-full md:w-6">
                         <Card style="min-height: 20rem">
                             <template v-slot:title>
                                 <h5 class="font-medium">时间（必选）</h5>
@@ -287,7 +287,7 @@ visitStore.fetchVisitIPRegion(
                         </Card>
                     </div>
                     <!--短链-->
-                    <div class="mt-2 sm:col-12 md:col-6">
+                    <div class="pt-4 md:pt-2 w-full md:w-6">
                         <Card style="min-height: 20rem">
                             <template v-slot:title>
                                 <h5 class="font-medium">短链</h5>
@@ -348,21 +348,14 @@ visitStore.fetchVisitIPRegion(
                         </Card>
                     </div>
                 </div>
-                <div class="flex justify-content-end align-content-center">
-                    <div class="my-2">
-                        <Button
-                            label="确认筛选"
-                            icon="pi pi-filter"
-                            class="p-button-success mr-2"
-                            @click="confirmFilter"
-                        />
-                        <Button
-                            label="清除筛选"
-                            icon="pi pi-filter-slash"
-                            class="p-button-danger"
-                            @click="clearAllFilter"
-                        />
-                    </div>
+                <div class="flex justify-content-between align-content-center md:justify-content-end mt-3">
+                    <Button
+                        label="清除筛选"
+                        icon="pi pi-filter-slash"
+                        class="p-button-danger mr-2"
+                        @click="clearAllFilter"
+                    />
+                    <Button label="确认筛选" icon="pi pi-filter" class="p-button-success" @click="confirmFilter" />
                 </div>
             </div>
         </div>
