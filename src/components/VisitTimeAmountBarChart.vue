@@ -58,6 +58,13 @@ const options = {
         legend: {
             display: false
         }
+    },
+    scales: {
+        y: {
+            ticks: {
+                stepSize: 1
+            }
+        }
     }
 };
 </script>
@@ -66,7 +73,19 @@ const options = {
     <div class="col-12 xl:col-6">
         <div class="card">
             <h5>{{ titleRef }}</h5>
-            <Chart type="bar" :data="data" :options="options" class="h-20rem" />
+            <h3
+                v-if="!(visitAmount && visitAmount.length > 0)"
+                class="flex align-items-center justify-content-center text-500 my-6"
+            >
+                无数据
+            </h3>
+            <Chart
+                v-if="visitAmount && visitAmount.length > 0"
+                type="bar"
+                :data="data"
+                :options="options"
+                class="h-20rem"
+            />
         </div>
     </div>
 </template>

@@ -391,10 +391,13 @@ visitStore.fetchVisitIPRegion(
         <div class="col-12 xl:col-6">
             <div class="card">
                 <h5>访问-时间</h5>
-                <h3 v-if="visitAmount.length <= 0" class="flex align-items-center justify-content-center text-500 my-6">
+                <h3
+                    v-if="!(visitAmount && visitAmount.length > 0)"
+                    class="flex align-items-center justify-content-center text-500 my-6"
+                >
                     无数据
                 </h3>
-                <div v-if="visitAmount.length > 0">
+                <div v-if="visitAmount && visitAmount.length > 0">
                     <Chart type="line" :data="lineData" :options="lineOptions" style="min-height: 20rem"></Chart>
                 </div>
             </div>
