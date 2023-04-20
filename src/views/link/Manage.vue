@@ -308,10 +308,9 @@ linkStore.fetchLinks();
                 <!--EditDialog-->
                 <Dialog
                     v-model:visible="editDialogVisible"
-                    :style="{ width: '450px' }"
                     :header="editDialogHeader"
                     :modal="true"
-                    class="p-fluid"
+                    class="p-fluid w-8 md:w-30rem"
                 >
                     <div class="field">
                         <label for="editLongLink">长链</label>
@@ -343,9 +342,9 @@ linkStore.fetchLinks();
                 <!--DeleteDialog-->
                 <Dialog
                     v-model:visible="deleteDialogVisible"
-                    :style="{ width: '450px' }"
                     header="确认删除"
                     :modal="true"
+                    class="p-fluid w-8 md:w-30rem"
                 >
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
@@ -373,12 +372,7 @@ linkStore.fetchLinks();
                 </Dialog>
 
                 <!--AddLinksFromFileDialog-->
-                <Dialog
-                    v-model:visible="addLinkFromFileDialogVisible"
-                    :style="{ width: '450px' }"
-                    header="确认添加"
-                    :modal="true"
-                >
+                <Dialog v-model:visible="addLinkFromFileDialogVisible" header="确认添加" :modal="true">
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
                         <span v-if="newLinks" style="width: 100%">确认添加以下{{ newLinks.length }}个链接</span>
