@@ -25,33 +25,70 @@ const newLinkDefault = {
 };
 const newLink = ref(newLinkDefault); // 暂存单个信息编辑/新增时使用
 const editDialogSubmitType = ref(''); // 提交类型: add-新增, update-更新
-const submitted = ref(false); // 表单是否提交, 用于编辑链接时验证
+const isFirstInput = ref(true); // 是否首次输入, 用于编辑链接时验证
+const isValidInput = ref('');
 const editDialogHeader = ref('新增链接');
 const editDialogVisible = ref(false);
 const openEditDialog = (linkItem) => {
     if (linkItem && linkItem.shortLink) {
         // 更新
+        isFirstInput.value = false;
         editDialogHeader.value = '更新链接';
         newLink.value = { ...linkItem };
         editDialogSubmitType.value = 'update';
     } else {
         // 新增
+        isFirstInput.value = true; //首次加载不验证
         editDialogHeader.value = '新增链接';
         newLink.value = newLinkDefault;
         editDialogSubmitType.value = 'add';
     }
-    submitted.value = false; //防止重复点击
     editDialogVisible.value = true; //显示Dialog
 };
 // 编辑/新建Dialog-取消
 const cancelEditDialog = () => {
     editDialogVisible.value = false;
-    submitted.value = false;
+    isFirstInput.value = true;
+    isValidInput.value = '';
 };
+
+function validateLongLink() {
+    // 首次加载不验证
+    if (isFirstInput.value === true) {
+        return true;
+    }
+    if (newLink.value.longLink.trim() === '') {
+        return false;
+    }
+    // 验证链接格式http://或https://开头
+    if (
+        newLink.value.longLink.startsWith('http://') === false &&
+        newLink.value.longLink.startsWith('https://') === false
+    ) {
+        return false;
+    }
+    return true;
+}
+
+watch(
+    newLink,
+    (val) => {
+        console.log('newLink', val);
+        if (val.longLink.trim() !== '') {
+            isFirstInput.value = false;
+        }
+        // 首次输入后开始验证
+        if (validateLongLink()) {
+            isValidInput.value = '';
+        } else {
+            isValidInput.value = 'p-invalid';
+        }
+    },
+    { deep: true }
+);
+
 // 编辑/新建Dialog-确认
 const confirmEditDialog = () => {
-    submitted.value = true;
-
     // 更新
     if (editDialogSubmitType.value === 'update') {
         linkStore.updateLink(newLink.value).then((res) => {
@@ -81,6 +118,7 @@ const confirmEditDialog = () => {
             });
     }
 
+    isFirstInput.value = true;
     editDialogVisible.value = false;
     newLink.value = newLinkDefault;
 };
@@ -318,9 +356,9 @@ linkStore.fetchLinks();
                             id="editLongLink"
                             v-model.trim="newLink.longLink"
                             required="true"
-                            :placeholder="newLink.longLink"
+                            placeholder="请输入长链接(必须以http://或https://开头)"
                             autofocus
-                            :class="{ 'p-invalid': submitted && !newLink.longLink }"
+                            :class="isValidInput"
                         />
                     </div>
                     <div class="field">
@@ -335,7 +373,13 @@ linkStore.fetchLinks();
                     </div>
                     <template #footer>
                         <Button label="取消" icon="pi pi-times" class="p-button-text" @click="cancelEditDialog" />
-                        <Button label="确认" icon="pi pi-check" class="p-button-text" @click="confirmEditDialog" />
+                        <Button
+                            label="确认"
+                            icon="pi pi-check"
+                            class="p-button-text"
+                            @click="confirmEditDialog"
+                            :disabled="!(!isFirstInput && isValidInput === '')"
+                        />
                     </template>
                 </Dialog>
 
