@@ -38,7 +38,7 @@ linkStore.fetchLinksAmountTotal();
 <template>
     <div class="grid">
         <!-- 1 服务器在线状态 -->
-        <data-show-card title="服务器在线状态" custom="true">
+        <data-show-card title="转发服务器在线状态" custom="true">
             <span v-if="isOnline" class="text-900 font-semibold text-xl text-green-500">在线</span>
             <span v-if="!isOnline" class="text-900 font-semibold text-xl text-red-500">离线</span>
         </data-show-card>
