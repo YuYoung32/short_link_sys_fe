@@ -7,6 +7,7 @@ import { ref } from 'vue';
 
 import AppMenuItem from './AppMenuItem.vue';
 import { useRouter } from 'vue-router';
+import { expireKey, tokenKey } from '@/service/auth';
 
 const router = useRouter();
 
@@ -40,8 +41,8 @@ const model = ref([
                 label: '退出登录',
                 icon: 'pi pi-fw pi-desktop',
                 click: () => {
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('expire');
+                    localStorage.removeItem(tokenKey);
+                    localStorage.removeItem(expireKey);
                     router.push('/login');
                 }
             }

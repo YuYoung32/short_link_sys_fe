@@ -7,6 +7,7 @@
 import { ref, watch } from 'vue';
 import axios from '@/service/net';
 import { useRouter } from 'vue-router';
+import { expireKey, tokenKey } from '@/service/auth';
 
 const router = useRouter();
 const password = ref('');
@@ -30,8 +31,8 @@ function login() {
         .then((response) => {
             if (response.status === 200) {
                 // token存储到localStorage
-                localStorage.setItem('token', response.data.token);
-                localStorage.setItem('expire', response.data.expire);
+                localStorage.setItem(tokenKey, response.data.token);
+                localStorage.setItem(expireKey, response.data.expire);
                 router.push('/');
             } else {
                 throw '';

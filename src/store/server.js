@@ -6,6 +6,7 @@
 import axios from '@/service/net';
 import { defineStore } from 'pinia';
 import { pushAndPop } from '@/service/utils';
+import { tokenKey } from '@/service/auth';
 
 const state = () => {
     return {
@@ -101,12 +102,7 @@ const actions = {
         let failCount = 0;
 
         function wsConnect() {
-            const socket = new WebSocket('ws://localhost:8081/server/info1S');
-
-            //debug
-            // socket.addEventListener('open', () => {
-            //     console.log('WebSocket connection established');
-            // });
+            const socket = new WebSocket('ws://localhost:8081/server/info1S?token=' + localStorage.getItem(tokenKey));
 
             socket.addEventListener('message', (event) => {
                 const info = JSON.parse(event.data);

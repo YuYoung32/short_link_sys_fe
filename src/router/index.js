@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import AppLayout from '../layout/AppLayout.vue';
+import { expireKey } from '@/service/auth';
 
 const routes = [
     {
@@ -57,7 +58,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-    const expire = localStorage.getItem('expire');
+    const expire = localStorage.getItem(expireKey);
     const hasExpired = expire === null || expire === '' || expire < new Date().getTime();
     if (to.path === '/login') {
         if (hasExpired) {
