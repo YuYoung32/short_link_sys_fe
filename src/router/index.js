@@ -43,6 +43,11 @@ const routes = [
                 component: () => import('@/views/settings/User.vue')
             }
         ]
+    },
+    {
+        path: '/login',
+        name: 'login',
+        component: () => import('@/views/Login.vue')
     }
 ];
 
@@ -51,4 +56,22 @@ const router = createRouter({
     routes
 });
 
+router.beforeEach((to, from, next) => {
+    const expire = localStorage.getItem('expire');
+    const hasExpired = expire === null || expire === '' || expire < new Date().getTime();
+    if (to.path === '/login') {
+        if (hasExpired) {
+            next();
+        } else {
+            // 未过期跳转到首页
+            next('/');
+        }
+    } else {
+        if (hasExpired) {
+            next('/login');
+        } else {
+            next();
+        }
+    }
+});
 export default router;

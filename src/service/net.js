@@ -5,8 +5,21 @@
 
 import axios from 'axios';
 
-export default axios.create({
+const instance = axios.create({
     baseURL: 'http://localhost:8081'
     // timeout: 1000,
     // headers: {'X-Custom-Header': 'foobar'}
 });
+
+instance.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token') === null ? '' : localStorage.getItem('token');
+        config.headers.Authorization = 'Bearer ' + token;
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+export default instance;
