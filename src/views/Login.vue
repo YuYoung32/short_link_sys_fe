@@ -27,7 +27,9 @@ function login() {
         return;
     }
     axios
-        .get(`/auth/login?password=${password.value}`)
+        .post(`/auth/login`, {
+            password: password.value
+        })
         .then((response) => {
             if (response.status === 200) {
                 // token存储到localStorage
