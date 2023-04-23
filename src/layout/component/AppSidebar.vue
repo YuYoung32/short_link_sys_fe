@@ -6,6 +6,9 @@
 import { ref } from 'vue';
 
 import AppMenuItem from './AppMenuItem.vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const model = ref([
     {
@@ -33,7 +36,15 @@ const model = ref([
         label: '设置',
         items: [
             { label: '用户', icon: 'pi pi-fw pi-user', to: '/settings/user' },
-            { label: '退出登录', icon: 'pi pi-fw pi-desktop', target: '_blank' }
+            {
+                label: '退出登录',
+                icon: 'pi pi-fw pi-desktop',
+                click: () => {
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('expire');
+                    router.push('/login');
+                }
+            }
         ]
     }
 ]);

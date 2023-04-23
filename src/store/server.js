@@ -108,10 +108,6 @@ const actions = {
             //     console.log('WebSocket connection established');
             // });
 
-            socket.addEventListener('error', (error) => {
-                console.error('WebSocket error:', error);
-            });
-
             socket.addEventListener('message', (event) => {
                 const info = JSON.parse(event.data);
 

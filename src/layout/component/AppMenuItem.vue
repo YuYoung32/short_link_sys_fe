@@ -28,14 +28,19 @@ const itemClick = () => {
         <div v-if="root" class="layout-menuitem-root-text">{{ item.label }}</div>
 
         <!--跳转到其他页面, 非注册在 / 下, 没有to, 通过url跳转, 由于标签不同<a>和<router-link>不同, 必须区分-->
-        <a v-if="!item.to" :href="item.url" @click="itemClick()" :target="item.target">
+        <a v-if="!item.to" :href="item.url" @click="item.click">
             <i :class="item.icon" class="layout-menuitem-icon"></i>
             <span class="layout-menuitem-text">{{ item.label }}</span>
         </a>
 
         <!--跳转显示各个路由, 有to-->
         <!--class用来匹配当前URL和所有侧边栏选项, 若匹配设置颜色-->
-        <router-link v-if="item.to" @click="itemClick()" :class="{ 'active-route': route.path === item.to }" :to="item.to">
+        <router-link
+            v-if="item.to"
+            @click="itemClick()"
+            :class="{ 'active-route': route.path === item.to }"
+            :to="item.to"
+        >
             <i :class="item.icon" class="layout-menuitem-icon"></i>
             <span class="layout-menuitem-text">{{ item.label }}</span>
         </router-link>
