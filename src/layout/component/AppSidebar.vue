@@ -28,10 +28,7 @@ const model = ref([
     },
     {
         label: '性能',
-        items: [
-            { label: '性能监控', icon: 'pi pi-fw pi-eye', to: '/performance/monitor' },
-            { label: '性能测试', icon: 'pi pi-fw pi-calculator', to: '/performance/benchmark' }
-        ]
+        items: [{ label: '性能监控', icon: 'pi pi-fw pi-eye', to: '/performance/monitor' }]
     },
     {
         label: '设置',
