@@ -6,7 +6,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'http://localhost:8081'
+    baseURL: process.env.VUE_APP_BASE_API
     // timeout: 1000,
     // headers: {'X-Custom-Header': 'foobar'}
 });

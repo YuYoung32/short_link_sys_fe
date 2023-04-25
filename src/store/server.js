@@ -102,7 +102,9 @@ const actions = {
         let failCount = 0;
 
         function wsConnect() {
-            const socket = new WebSocket('ws://localhost:8081/server/info1S?token=' + localStorage.getItem(tokenKey));
+            const socket = new WebSocket(
+                process.env.VUE_APP_BASE_WS_API + '/server/info1S?token=' + localStorage.getItem(tokenKey)
+            );
 
             socket.addEventListener('message', (event) => {
                 const info = JSON.parse(event.data);
