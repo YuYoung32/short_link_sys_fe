@@ -107,6 +107,12 @@ const lineOptions = ref({
                 display: true
             }
         }
+    },
+    layout: {
+        autoPadding: false,
+        padding: {
+            bottom: 2
+        }
     }
 });
 //endregion

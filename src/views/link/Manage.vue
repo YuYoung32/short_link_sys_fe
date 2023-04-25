@@ -73,7 +73,6 @@ function validateLongLink() {
 watch(
     newLink,
     (val) => {
-        console.log('newLink', val);
         if (val.longLink.trim() !== '') {
             isFirstInput.value = false;
         }

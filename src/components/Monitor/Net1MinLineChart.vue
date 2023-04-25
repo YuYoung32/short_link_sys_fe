@@ -23,6 +23,7 @@ data.setData(netRecvLastMin, color.net);
 data.datasets[1].backgroundColor = color.transparent;
 data.datasets[1].borderDash = [5, 5];
 const options = new RealTimeLineChartOption();
+options.scales.y.min = 0;
 options.plugins.tooltip = {
     callbacks: {
         label: (context) => {
