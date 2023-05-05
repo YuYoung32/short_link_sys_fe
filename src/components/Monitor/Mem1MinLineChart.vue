@@ -15,7 +15,7 @@ import { autoTransferMemUnit } from '@/service/utils';
 import { color } from '@/components/Monitor/color';
 
 const serverStore = useServerStore();
-const { memUsageLastMin, memAvailLastSec, swapUsageLastSec, memStaticInfo, memUsageLastSec } = storeToRefs(serverStore);
+const { memUsageLastMin, swapUsageLastSec, memStaticInfo, memUsageLastSec } = storeToRefs(serverStore);
 
 const data = reactive(new RealTimeLineChartData());
 data.setData(memUsageLastMin, color.mem);
@@ -61,7 +61,6 @@ options.plugins.tooltip = {
                         title="使用百分比"
                         :data="serverStore.memUsageRatioLastSec + '%'"
                     />
-                    <TitleDataDivVertical class="pr-3 pt-2" title="可用" :data="autoTransferMemUnit(memAvailLastSec)" />
                 </div>
                 <div class="flex flex-wrap">
                     <TitleDataDivVertical
